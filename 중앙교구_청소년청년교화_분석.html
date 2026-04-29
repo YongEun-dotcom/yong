@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>중앙교구 청소년·청년 교화 현황 분석</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Apple SD Gothic Neo',system-ui,sans-serif;background:#f8f7f4;color:#2c2c2a;font-size:16px;line-height:1.8;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:980px;margin:0 auto;padding:24px 20px;}
+h1{font-size:22px;font-weight:600;margin-bottom:2px;}
+h3{font-size:15px;font-weight:600;margin-bottom:8px;}
+.meta{font-size:13px;color:#73726c;margin-bottom:20px;line-height:1.8;}
+.tab-row{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid #d3d1c7;background:#f1efe8;color:#5f5e5a;transition:all .15s;}
+.tab.on{background:#2c2c2a;color:#fff;border-color:#2c2c2a;}
+.tp{display:none;}.tp.on{display:block;}
+.card{background:#fff;border:0.5px solid #d3d1c7;border-radius:12px;padding:16px 18px;margin-bottom:10px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+.kpi{background:#f1efe8;border-radius:8px;padding:14px 16px;}
+.kpi label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#73726c;display:block;margin-bottom:3px;}
+.kpi .v{font-size:28px;font-weight:600;line-height:1.1;}
+.kpi .s{font-size:12px;color:#73726c;margin-top:3px;line-height:1.6;}
+.note{border-radius:8px;padding:12px 16px;font-size:13px;line-height:1.9;border-left:3px solid;margin-bottom:8px;color:#2c2c2a;}
+.n-b{background:#e6f1fb;border-color:#185fa5;}.n-t{background:#eaf3de;border-color:#3b6d11;}
+.n-a{background:#faeeda;border-color:#854f0b;}.n-r{background:#fcebeb;border-color:#a32d2d;}
+.n-g{background:#f1efe8;border-color:#888780;}.note strong{font-weight:600;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{font-size:11px;font-weight:600;color:#73726c;padding:8px 10px;border-bottom:0.5px solid #d3d1c7;text-align:center;background:#f1efe8;}
+.tbl th:first-child{text-align:left;}
+.tbl td{padding:8px 10px;border-bottom:0.5px solid #d3d1c7;text-align:center;}
+.tbl td:first-child{text-align:left;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr.tot td{background:#f1efe8;font-weight:600;border-top:0.5px solid #b4b2a9;}
+.up{color:#3b6d11;font-weight:600;}.dn{color:#a32d2d;font-weight:600;}
+.fn{font-size:11px;color:#888780;margin-top:8px;line-height:1.7;padding-top:6px;border-top:0.5px solid #d3d1c7;}
+.fn span{display:block;}
+.fn-def{background:#f8f7f4;border-radius:6px;padding:8px 12px;margin-top:6px;}
+.fn-def .fn-title{font-size:11px;font-weight:600;color:#73726c;margin-bottom:4px;}
+.fn-def .fn-item{font-size:11px;color:#888780;line-height:1.7;display:block;}
+.badge{font-size:11px;padding:3px 8px;border-radius:5px;font-weight:600;display:inline-block;}
+.b-hi{background:#e6f1fb;color:#185fa5;}.b-md{background:#eaf3de;color:#3b6d11;}
+.b-lo{background:#faeeda;color:#854f0b;}.b-no{background:#f1efe8;color:#888780;}
+.shd{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #d3d1c7;}
+.snum{background:#2c2c2a;color:#fff;font-size:12px;font-weight:600;padding:3px 12px;border-radius:10px;}
+.sttl{font-size:16px;font-weight:600;}.ssub{font-size:12px;color:#73726c;margin-top:1px;}
+.cv{background:#fff;border-radius:8px;padding:4px;overflow:hidden;margin-bottom:4px;}
+.alert{background:#fcebeb;border:1.5px solid #a32d2d;border-radius:10px;padding:14px 18px;margin-bottom:12px;}
+.alert-title{font-size:14px;font-weight:600;color:#a32d2d;margin-bottom:5px;}
+.alert-body{font-size:13px;color:#2c2c2a;line-height:1.9;}
+.find-card{border-radius:10px;padding:14px 16px;border:0.5px solid;margin-bottom:10px;}
+.fc-b{background:#e6f1fb;border-color:#185fa5;}.fc-t{background:#eaf3de;border-color:#3b6d11;}
+.fc-a{background:#faeeda;border-color:#854f0b;}.fc-r{background:#fcebeb;border-color:#a32d2d;}
+.fc-title{font-size:14px;font-weight:600;margin-bottom:6px;}
+.fc-body{font-size:13px;line-height:1.9;}
+.sc{border-radius:12px;padding:16px;margin-bottom:10px;border:0.5px solid;}
+.sc1{background:#e6f1fb;border-color:#185fa5;}.sc2{background:#eaf3de;border-color:#3b6d11;}.sc3{background:#faeeda;border-color:#854f0b;}
+.sc-h{font-size:15px;font-weight:600;margin-bottom:6px;}
+.sc-b{font-size:13px;color:#5f5e5a;line-height:1.9;margin-bottom:8px;}
+.sc-g{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.sc-i{background:rgba(255,255,255,0.65);border-radius:8px;padding:9px 12px;font-size:12px;line-height:1.7;}
+.sc-in{font-size:11px;font-weight:600;color:#73726c;margin-bottom:3px;}
+.sum-sec{margin-bottom:28px;}
+.sum-title{font-size:17px;font-weight:600;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #2c2c2a;}
+.sum-box{background:#2c2c2a;color:#fff;border-radius:10px;padding:14px 18px;margin-bottom:12px;}
+.sum-box-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#b4b2a9;margin-bottom:4px;}
+.sum-box-text{font-size:15px;font-weight:500;line-height:1.7;}
+.sum-body{font-size:14px;line-height:2.0;}
+.sum-body p{margin-bottom:12px;}
+.sum-body strong{font-weight:600;}
+.sum-hl{background:#f1efe8;border-left:3px solid #2c2c2a;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:13px;line-height:1.9;}
+.sum-div{border:none;border-top:1px solid #d3d1c7;margin:24px 0;}
+.ep3{background:#e6f1fb;color:#185fa5;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;}
+.ep1{background:#eaf3de;color:#3b6d11;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;display:inline-block;}
+.sum-close{background:#f1efe8;border-radius:12px;padding:18px 20px;font-size:13px;line-height:2.0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>중앙교구 청소년·청년 교화 현황 분석</h1>
+<div class="meta">기존 중앙교구 분석(Step 1~5) 연장 · 원기 90~108년(2005~2023년) 법회 출석 데이터 기반 · 충용교당 제외<br>사용 데이터: 법회출석90108long2.csv / data_member.csv / 군종교당입교데이터.csv / 전무출신기본정보.xlsx / 교당근무자data97108.xlsx</div>
+
+<div class="tab-row" id="tabs">
+  <button class="tab on" id="btn-t1" onclick="sw('t1','btn-t1')">① 현황 진단</button>
+  <button class="tab" id="btn-t2" onclick="sw('t2','btn-t2')">② 원인 분석</button>
+  <button class="tab" id="btn-t3" onclick="sw('t3','btn-t3')">③ 심층 분석</button>
+  <button class="tab" id="btn-t4" onclick="sw('t4','btn-t4')">④ 사례 분석</button>
+  <button class="tab" id="btn-t5" onclick="sw('t5','btn-t5')">⑤ 대안·전략</button>
+  <button class="tab" id="btn-t7" onclick="sw('t7','btn-t7')">⑥ 외부 시선</button>
+  <button class="tab" id="btn-t6" onclick="sw('t6','btn-t6')">📋 핵심 요약</button>
+</div>
+
+<!-- ① 현황 진단 -->
+<div class="tp on" id="t1">
+  <div class="shd"><span class="snum">현황</span><div><div class="sttl">청소년·청년 출석, 얼마나 심각한가</div><div class="ssub">어린이·학생·청년 법회 출석 18년 추이 · 교당별 분포</div></div></div>
+  <div class="alert">
+    <div class="alert-title">⚠ 핵심 — 어린이 출석이 일반 성인의 5배 속도로 줄었습니다</div>
+    <div class="alert-body">원기 90년 대비 108년, 어린이 법회 출석 <strong>-76%</strong>, 학생 <strong>-64%</strong>, 청년 <strong>-68%</strong> 감소. 같은 기간 일반(성인) 출석은 -16%. 39개 교당 중 <strong>18개(46%)는 청소년 출석이 0</strong>입니다.</div>
+  </div>
+  <div class="g4">
+    <div class="kpi" style="border-top:3px solid #a32d2d;"><label>어린이 출석 감소</label><div class="v dn">-76%</div><div class="s">주평균 348명 → 83명</div></div>
+    <div class="kpi" style="border-top:3px solid #a32d2d;"><label>학생 출석 감소</label><div class="v dn">-64%</div><div class="s">159명 → 57명 / 성인의 4배 속도</div></div>
+    <div class="kpi" style="border-top:3px solid #a32d2d;"><label>청년 출석 감소</label><div class="v dn">-68%</div><div class="s">202명 → 65명 / 비중 6.5→2.9%</div></div>
+    <div class="kpi" style="border-top:3px solid #888780;"><label>청소년 출석 0 교당</label><div class="v" style="color:#888780;">18개</div><div class="s">전체 39개 중 46%</div></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:4px;">어린이 vs 일반 성인 — 주평균 출석 이중 축 비교</h3>
+    <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 230" style="width:100%" role="img"><title>어린이 vs 일반 성인 법회 출석 주평균 추이 (원기 90→108년)</title><rect x="60" y="38" width="558" height="150" fill="#fdf6f0" opacity="0.4" rx="4"/><line x1="60" y1="38" x2="618" y2="38" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="54" y="42" text-anchor="end" font-size="9.5" fill="#854f0b">474</text><text x="624" y="42" text-anchor="start" font-size="9.5" fill="#888780">3,869</text><line x1="60" y1="76" x2="618" y2="76" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="54" y="80" text-anchor="end" font-size="9.5" fill="#854f0b">356</text><text x="624" y="80" text-anchor="start" font-size="9.5" fill="#888780">2,902</text><line x1="60" y1="113" x2="618" y2="113" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="54" y="117" text-anchor="end" font-size="9.5" fill="#854f0b">237</text><text x="624" y="117" text-anchor="start" font-size="9.5" fill="#888780">1,934</text><line x1="60" y1="150" x2="618" y2="150" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="54" y="154" text-anchor="end" font-size="9.5" fill="#854f0b">118</text><text x="624" y="154" text-anchor="start" font-size="9.5" fill="#888780">967</text><line x1="60" y1="188" x2="618" y2="188" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="54" y="192" text-anchor="end" font-size="9.5" fill="#854f0b">0</text><text x="624" y="192" text-anchor="start" font-size="9.5" fill="#888780">0</text><text x="60" y="202" text-anchor="middle" font-size="9.5" fill="#999">90년</text><text x="91" y="202" text-anchor="middle" font-size="9.5" fill="#999">91년</text><text x="122" y="202" text-anchor="middle" font-size="9.5" fill="#999">92년</text><text x="153" y="202" text-anchor="middle" font-size="9.5" fill="#999">93년</text><text x="184" y="202" text-anchor="middle" font-size="9.5" fill="#999">94년</text><text x="215" y="202" text-anchor="middle" font-size="9.5" fill="#999">95년</text><text x="246" y="202" text-anchor="middle" font-size="9.5" fill="#999">96년</text><text x="277" y="202" text-anchor="middle" font-size="9.5" fill="#999">97년</text><text x="308" y="202" text-anchor="middle" font-size="9.5" fill="#999">98년</text><text x="339" y="202" text-anchor="middle" font-size="9.5" fill="#999">99년</text><text x="370" y="202" text-anchor="middle" font-size="9.5" fill="#999">100년</text><text x="401" y="202" text-anchor="middle" font-size="9.5" fill="#999">101년</text><text x="432" y="202" text-anchor="middle" font-size="9.5" fill="#999">102년</text><text x="463" y="202" text-anchor="middle" font-size="9.5" fill="#999">103년</text><text x="494" y="202" text-anchor="middle" font-size="9.5" fill="#999">104년</text><text x="525" y="202" text-anchor="middle" font-size="9.5" fill="#999">105년</text><text x="556" y="202" text-anchor="middle" font-size="9.5" fill="#999">106년</text><text x="587" y="202" text-anchor="middle" font-size="9.5" fill="#999">107년</text><text x="618" y="202" text-anchor="middle" font-size="9.5" fill="#999">108년</text><text x="54" y="30" text-anchor="end" font-size="10" fill="#854f0b" font-weight="600">어린이(명, 좌)</text><text x="624" y="30" text-anchor="start" font-size="10" fill="#888780" font-weight="600">일반성인(명, 우)</text><polygon points="60.0,94.9 91.0,86.8 122.0,83.6 153.0,68.9 184.0,63.0 215.0,68.3 246.0,74.0 277.0,74.8 308.0,82.5 339.0,81.5 370.0,81.7 401.0,90.1 432.0,88.4 463.0,89.9 494.0,96.5 525.0,136.7 556.0,110.0 587.0,110.7 618.0,109.8 618.0,188 60.0,188" fill="#888780" fill-opacity="0.07"/><polyline points="60.0,94.9 91.0,86.8 122.0,83.6 153.0,68.9 184.0,63.0 215.0,68.3 246.0,74.0 277.0,74.8 308.0,82.5 339.0,81.5 370.0,81.7 401.0,90.1 432.0,88.4 463.0,89.9 494.0,96.5 525.0,136.7 556.0,110.0 587.0,110.7 618.0,109.8" stroke="#888780" stroke-width="1.5" fill="none" stroke-dasharray="5,4"/><circle cx="60.0" cy="94.9" r="2.5" fill="#888780"/><circle cx="91.0" cy="86.8" r="2.5" fill="#888780"/><circle cx="122.0" cy="83.6" r="2.5" fill="#888780"/><circle cx="153.0" cy="68.9" r="2.5" fill="#888780"/><circle cx="184.0" cy="63.0" r="2.5" fill="#888780"/><circle cx="215.0" cy="68.3" r="2.5" fill="#888780"/><circle cx="246.0" cy="74.0" r="2.5" fill="#888780"/><circle cx="277.0" cy="74.8" r="2.5" fill="#888780"/><circle cx="308.0" cy="82.5" r="2.5" fill="#888780"/><circle cx="339.0" cy="81.5" r="2.5" fill="#888780"/><circle cx="370.0" cy="81.7" r="2.5" fill="#888780"/><circle cx="401.0" cy="90.1" r="2.5" fill="#888780"/><circle cx="432.0" cy="88.4" r="2.5" fill="#888780"/><circle cx="463.0" cy="89.9" r="2.5" fill="#888780"/><circle cx="494.0" cy="96.5" r="2.5" fill="#888780"/><circle cx="525.0" cy="136.7" r="2.5" fill="#888780"/><circle cx="556.0" cy="110.0" r="2.5" fill="#888780"/><circle cx="587.0" cy="110.7" r="2.5" fill="#888780"/><circle cx="618.0" cy="109.8" r="2.5" fill="#888780"/><polygon points="60.0,77.9 91.0,70.3 122.0,80.1 153.0,63.0 184.0,82.0 215.0,93.4 246.0,110.2 277.0,118.1 308.0,127.2 339.0,134.5 370.0,126.6 401.0,134.5 432.0,137.4 463.0,143.1 494.0,149.1 525.0,174.7 556.0,169.0 587.0,167.4 618.0,161.7 618.0,188 60.0,188" fill="#854f0b" fill-opacity="0.15"/><polyline points="60.0,77.9 91.0,70.3 122.0,80.1 153.0,63.0 184.0,82.0 215.0,93.4 246.0,110.2 277.0,118.1 308.0,127.2 339.0,134.5 370.0,126.6 401.0,134.5 432.0,137.4 463.0,143.1 494.0,149.1 525.0,174.7 556.0,169.0 587.0,167.4 618.0,161.7" stroke="#854f0b" stroke-width="2.5" fill="none"/><circle cx="60.0" cy="77.9" r="3" fill="#854f0b"/><circle cx="91.0" cy="70.3" r="3" fill="#854f0b"/><circle cx="122.0" cy="80.1" r="3" fill="#854f0b"/><circle cx="153.0" cy="63.0" r="3" fill="#854f0b"/><circle cx="184.0" cy="82.0" r="3" fill="#854f0b"/><circle cx="215.0" cy="93.4" r="3" fill="#854f0b"/><circle cx="246.0" cy="110.2" r="3" fill="#854f0b"/><circle cx="277.0" cy="118.1" r="3" fill="#854f0b"/><circle cx="308.0" cy="127.2" r="3" fill="#854f0b"/><circle cx="339.0" cy="134.5" r="3" fill="#854f0b"/><circle cx="370.0" cy="126.6" r="3" fill="#854f0b"/><circle cx="401.0" cy="134.5" r="3" fill="#854f0b"/><circle cx="432.0" cy="137.4" r="3" fill="#854f0b"/><circle cx="463.0" cy="143.1" r="3" fill="#854f0b"/><circle cx="494.0" cy="149.1" r="3" fill="#854f0b"/><circle cx="525.0" cy="174.7" r="3" fill="#854f0b"/><circle cx="556.0" cy="169.0" r="3" fill="#854f0b"/><circle cx="587.0" cy="167.4" r="3" fill="#854f0b"/><circle cx="618.0" cy="161.7" r="3" fill="#854f0b"/><text x="623" y="160" font-size="9" fill="#854f0b" font-weight="600">83명</text><text x="623" y="171" font-size="8.5" fill="#854f0b" opacity="0.8">(-76%)</text><text x="623" y="108" font-size="9" fill="#888780" font-weight="600">2,018명</text><text x="623" y="119" font-size="8.5" fill="#888780" opacity="0.8">(-16%)</text><text x="340.0" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">어린이 vs 일반 성인 법회 출석 주평균 추이 (원기 90→108년)</text><line x1="60" y1="30" x2="76" y2="30" stroke="#854f0b" stroke-width="2" /><circle cx="68" cy="30" r="3" fill="#854f0b"/><text x="82" y="34" font-size="10" fill="#555">어린이(명, 좌)</text><line x1="156" y1="30" x2="172" y2="30" stroke="#888780" stroke-width="2" stroke-dasharray="5,4"/><circle cx="164" cy="30" r="3" fill="#888780"/><text x="178" y="34" font-size="10" fill="#555">일반성인(명, 우)</text><text x="268" y="34" font-size="9.5" fill="#aaa">— 점선·오른쪽 축: 일반(성인) / 실선·왼쪽 축: 어린이</text></svg></div>
+    <div class="fn">
+      <span>· 사용 계정과목: 교정통계 '어린이출석수' 계정 / 주평균 = 연간 출석 합계 ÷ 52주</span>
+      <span>· 105년 급락: 집계 방식 이상으로 해석. 전 교구 동일 현상 확인.</span>
+      <span>· 그래프에서 선이 낮을수록 감소폭이 큼. 어린이(주황)가 일반(회색)보다 훨씬 빠르게 내려갑니다.
+      <span>· 오른쪽 끝 수치: 90년 대비 108년 변화율. 어린이 -76% vs 일반 -16%.</span>
+      <div class="fn-def">
+        <span class="fn-title">📌 읽는 법</span>
+        <span class="fn-item">· 주황 실선이 위에 있을수록 어린이 법회 출석이 많습니다. 93년 이후 지속 하락 중.</span>
+        <span class="fn-item">· 일반 성인(회색)은 훨씬 많지만 감소 기울기가 완만합니다. 어린이 감소가 5배 빠름을 시각화한 것.</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:4px;">학생·청년 법회 — 두 그룹 분리해서 보기</h3>
+    <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" style="width:100%" role="img"><title>학생·청년 법회 주평균 출석 추이 (원기 90→108년)</title><line x1="50" y1="34" x2="666" y2="34" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="38" text-anchor="end" font-size="9.5" fill="#999">260</text><line x1="50" y1="66" x2="666" y2="66" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="70" text-anchor="end" font-size="9.5" fill="#999">195</text><line x1="50" y1="98" x2="666" y2="98" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="102" text-anchor="end" font-size="9.5" fill="#999">130</text><line x1="50" y1="130" x2="666" y2="130" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="134" text-anchor="end" font-size="9.5" fill="#999">65</text><line x1="50" y1="162" x2="666" y2="162" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="166" text-anchor="end" font-size="9.5" fill="#999">0</text><text x="50" y="175" text-anchor="middle" font-size="9.5" fill="#999">90년</text><text x="84" y="175" text-anchor="middle" font-size="9.5" fill="#999">91년</text><text x="118" y="175" text-anchor="middle" font-size="9.5" fill="#999">92년</text><text x="153" y="175" text-anchor="middle" font-size="9.5" fill="#999">93년</text><text x="187" y="175" text-anchor="middle" font-size="9.5" fill="#999">94년</text><text x="221" y="175" text-anchor="middle" font-size="9.5" fill="#999">95년</text><text x="255" y="175" text-anchor="middle" font-size="9.5" fill="#999">96년</text><text x="290" y="175" text-anchor="middle" font-size="9.5" fill="#999">97년</text><text x="324" y="175" text-anchor="middle" font-size="9.5" fill="#999">98년</text><text x="358" y="175" text-anchor="middle" font-size="9.5" fill="#999">99년</text><text x="392" y="175" text-anchor="middle" font-size="9.5" fill="#999">100년</text><text x="426" y="175" text-anchor="middle" font-size="9.5" fill="#999">101년</text><text x="461" y="175" text-anchor="middle" font-size="9.5" fill="#999">102년</text><text x="495" y="175" text-anchor="middle" font-size="9.5" fill="#999">103년</text><text x="529" y="175" text-anchor="middle" font-size="9.5" fill="#999">104년</text><text x="563" y="175" text-anchor="middle" font-size="9.5" fill="#999">105년</text><text x="598" y="175" text-anchor="middle" font-size="9.5" fill="#999">106년</text><text x="632" y="175" text-anchor="middle" font-size="9.5" fill="#999">107년</text><text x="666" y="175" text-anchor="middle" font-size="9.5" fill="#999">108년</text><polygon points="50.0,62.6 84.2,69.4 118.4,71.4 152.7,71.9 186.9,71.4 221.1,72.9 255.3,78.8 289.6,84.2 323.8,84.7 358.0,98.5 392.2,88.6 426.4,90.6 460.7,101.9 494.9,106.9 529.1,108.8 563.3,137.4 597.6,130.5 631.8,131.5 666.0,130.0 666.0,162 50.0,162" fill="#185fa5" fill-opacity="0.12"/><polyline points="50.0,62.6 84.2,69.4 118.4,71.4 152.7,71.9 186.9,71.4 221.1,72.9 255.3,78.8 289.6,84.2 323.8,84.7 358.0,98.5 392.2,88.6 426.4,90.6 460.7,101.9 494.9,106.9 529.1,108.8 563.3,137.4 597.6,130.5 631.8,131.5 666.0,130.0" stroke="#185fa5" stroke-width="2.5" fill="none" /><circle cx="50.0" cy="62.6" r="3" fill="#185fa5"/><circle cx="84.2" cy="69.4" r="3" fill="#185fa5"/><circle cx="118.4" cy="71.4" r="3" fill="#185fa5"/><circle cx="152.7" cy="71.9" r="3" fill="#185fa5"/><circle cx="186.9" cy="71.4" r="3" fill="#185fa5"/><circle cx="221.1" cy="72.9" r="3" fill="#185fa5"/><circle cx="255.3" cy="78.8" r="3" fill="#185fa5"/><circle cx="289.6" cy="84.2" r="3" fill="#185fa5"/><circle cx="323.8" cy="84.7" r="3" fill="#185fa5"/><circle cx="358.0" cy="98.5" r="3" fill="#185fa5"/><circle cx="392.2" cy="88.6" r="3" fill="#185fa5"/><circle cx="426.4" cy="90.6" r="3" fill="#185fa5"/><circle cx="460.7" cy="101.9" r="3" fill="#185fa5"/><circle cx="494.9" cy="106.9" r="3" fill="#185fa5"/><circle cx="529.1" cy="108.8" r="3" fill="#185fa5"/><circle cx="563.3" cy="137.4" r="3" fill="#185fa5"/><circle cx="597.6" cy="130.5" r="3" fill="#185fa5"/><circle cx="631.8" cy="131.5" r="3" fill="#185fa5"/><circle cx="666.0" cy="130.0" r="3" fill="#185fa5"/><polygon points="50.0,83.7 84.2,80.8 118.4,77.3 152.7,48.8 186.9,53.2 221.1,73.9 255.3,75.8 289.6,79.8 323.8,90.6 358.0,83.2 392.2,86.7 426.4,92.6 460.7,81.8 494.9,90.6 529.1,103.9 563.3,138.9 597.6,130.5 631.8,132.0 666.0,133.9 666.0,162 50.0,162" fill="#3b6d11" fill-opacity="0.12"/><polyline points="50.0,83.7 84.2,80.8 118.4,77.3 152.7,48.8 186.9,53.2 221.1,73.9 255.3,75.8 289.6,79.8 323.8,90.6 358.0,83.2 392.2,86.7 426.4,92.6 460.7,81.8 494.9,90.6 529.1,103.9 563.3,138.9 597.6,130.5 631.8,132.0 666.0,133.9" stroke="#3b6d11" stroke-width="2.5" fill="none" /><circle cx="50.0" cy="83.7" r="3" fill="#3b6d11"/><circle cx="84.2" cy="80.8" r="3" fill="#3b6d11"/><circle cx="118.4" cy="77.3" r="3" fill="#3b6d11"/><circle cx="152.7" cy="48.8" r="3" fill="#3b6d11"/><circle cx="186.9" cy="53.2" r="3" fill="#3b6d11"/><circle cx="221.1" cy="73.9" r="3" fill="#3b6d11"/><circle cx="255.3" cy="75.8" r="3" fill="#3b6d11"/><circle cx="289.6" cy="79.8" r="3" fill="#3b6d11"/><circle cx="323.8" cy="90.6" r="3" fill="#3b6d11"/><circle cx="358.0" cy="83.2" r="3" fill="#3b6d11"/><circle cx="392.2" cy="86.7" r="3" fill="#3b6d11"/><circle cx="426.4" cy="92.6" r="3" fill="#3b6d11"/><circle cx="460.7" cy="81.8" r="3" fill="#3b6d11"/><circle cx="494.9" cy="90.6" r="3" fill="#3b6d11"/><circle cx="529.1" cy="103.9" r="3" fill="#3b6d11"/><circle cx="563.3" cy="138.9" r="3" fill="#3b6d11"/><circle cx="597.6" cy="130.5" r="3" fill="#3b6d11"/><circle cx="631.8" cy="132.0" r="3" fill="#3b6d11"/><circle cx="666.0" cy="133.9" r="3" fill="#3b6d11"/><text x="340.0" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">학생·청년 법회 주평균 출석 추이 (원기 90→108년)</text><line x1="50" y1="27" x2="66" y2="27" stroke="#185fa5" stroke-width="2.5"/><circle cx="58" cy="27" r="3" fill="#185fa5"/><text x="72" y="31" font-size="10" fill="#555">청년(대학생 포함)</text><line x1="152" y1="27" x2="168" y2="27" stroke="#3b6d11" stroke-width="2.5"/><circle cx="160" cy="27" r="3" fill="#3b6d11"/><text x="174" y="31" font-size="10" fill="#555">학생(중·고등학생)</text></svg></div>
+    <div class="fn">
+      <span>· 사용 계정과목: '청년출석수' + '대학생출석수' = 청년계 / '학생출석수' = 중·고등학생</span>
+      <span>· 104년까지는 청년≥학생이었다가 105년 이후 학생 더 가파른 감소 → 108년에 학생(57명) &lt; 청년(65명)으로 재역전.</span>
+      <div class="fn-def">
+        <span class="fn-title">📌 주목할 변화</span>
+        <span class="fn-item">· 두 선이 거의 겹치는 수준(각 57~65명). 학생과 청년의 차이가 사라지고 있습니다.</span>
+        <span class="fn-item">· 중·고등학생 이탈이 청년보다 더 가팔랐음. 주말 사교육·스마트폰 경쟁이 학생층에 더 직접적인 영향.</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:4px;">108년 교당별 청소년 출석 비중</h3>
+    <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 832" style="width:100%" role="img"><title>108년 교당별 청소년 출석 비중 (%)</title><line x1="72" y1="26" x2="72" y2="816" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="210" y1="26" x2="210" y2="816" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="348" y1="26" x2="348" y2="816" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="487" y1="26" x2="487" y2="816" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="625" y1="26" x2="625" y2="816" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="348.5" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">108년 교당별 청소년 출석 비중 (%)</text><rect x="72" y="33" width="493.7" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="44" text-anchor="end" font-size="10" fill="#2c2c2a">임피교당</text><text x="570" y="44" font-size="9" fill="#185fa5" font-weight="500">25.5%</text><rect x="72" y="53" width="443.4" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="64" text-anchor="end" font-size="10" fill="#2c2c2a">동영교당</text><text x="519" y="64" font-size="9" fill="#185fa5" font-weight="500">22.9%</text><rect x="72" y="73" width="331.1" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="84" text-anchor="end" font-size="10" fill="#2c2c2a">영등교당</text><text x="407" y="84" font-size="9" fill="#185fa5" font-weight="500">17.1%</text><rect x="72" y="93" width="302.1" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="104" text-anchor="end" font-size="10" fill="#2c2c2a">부송교당</text><text x="378" y="104" font-size="9" fill="#185fa5" font-weight="500">15.6%</text><rect x="72" y="113" width="282.7" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="124" text-anchor="end" font-size="10" fill="#2c2c2a">궁동교당</text><text x="359" y="124" font-size="9" fill="#3b6d11" font-weight="500">14.6%</text><rect x="72" y="133" width="282.7" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="144" text-anchor="end" font-size="10" fill="#2c2c2a">서이리교당</text><text x="359" y="144" font-size="9" fill="#3b6d11" font-weight="500">14.6%</text><rect x="72" y="153" width="280.8" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="164" text-anchor="end" font-size="10" fill="#2c2c2a">모현교당</text><text x="357" y="164" font-size="9" fill="#3b6d11" font-weight="500">14.5%</text><rect x="72" y="173" width="276.9" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="184" text-anchor="end" font-size="10" fill="#2c2c2a">금강교당</text><text x="353" y="184" font-size="9" fill="#3b6d11" font-weight="500">14.3%</text><rect x="72" y="193" width="247.8" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="204" text-anchor="end" font-size="10" fill="#2c2c2a">북일교당</text><text x="324" y="204" font-size="9" fill="#3b6d11" font-weight="500">12.8%</text><rect x="72" y="213" width="228.5" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="224" text-anchor="end" font-size="10" fill="#2c2c2a">남중교당</text><text x="304" y="224" font-size="9" fill="#3b6d11" font-weight="500">11.8%</text><rect x="72" y="233" width="195.6" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="244" text-anchor="end" font-size="10" fill="#2c2c2a">문화교당</text><text x="272" y="244" font-size="9" fill="#3b6d11" font-weight="500">10.1%</text><rect x="72" y="253" width="187.8" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="264" text-anchor="end" font-size="10" fill="#2c2c2a">남군산교당</text><text x="264" y="264" font-size="9" fill="#3b6d11" font-weight="500">9.7%</text><rect x="72" y="273" width="162.6" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="284" text-anchor="end" font-size="10" fill="#2c2c2a">동이리교당</text><text x="239" y="284" font-size="9" fill="#3b6d11" font-weight="500">8.4%</text><rect x="72" y="293" width="158.8" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="304" text-anchor="end" font-size="10" fill="#2c2c2a">이리교당</text><text x="235" y="304" font-size="9" fill="#3b6d11" font-weight="500">8.2%</text><rect x="72" y="313" width="151.0" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="324" text-anchor="end" font-size="10" fill="#2c2c2a">익산교당</text><text x="227" y="324" font-size="9" fill="#3b6d11" font-weight="500">7.8%</text><rect x="72" y="333" width="135.5" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="344" text-anchor="end" font-size="10" fill="#2c2c2a">낭산교당</text><text x="212" y="344" font-size="9" fill="#3b6d11" font-weight="500">7.0%</text><rect x="72" y="353" width="123.9" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="364" text-anchor="end" font-size="10" fill="#2c2c2a">어양교당</text><text x="200" y="364" font-size="9" fill="#3b6d11" font-weight="500">6.4%</text><rect x="72" y="373" width="67.8" height="14" fill="#854f0b" opacity="0.8" rx="2"/><text x="68" y="384" text-anchor="end" font-size="10" fill="#2c2c2a">군산교당</text><text x="144" y="384" font-size="9" fill="#854f0b" font-weight="500">3.5%</text><rect x="72" y="393" width="52.3" height="14" fill="#854f0b" opacity="0.8" rx="2"/><text x="68" y="404" text-anchor="end" font-size="10" fill="#2c2c2a">도원교당</text><text x="128" y="404" font-size="9" fill="#854f0b" font-weight="500">2.7%</text><rect x="72" y="413" width="34.9" height="14" fill="#854f0b" opacity="0.8" rx="2"/><text x="68" y="424" text-anchor="end" font-size="10" fill="#2c2c2a">무동교당</text><text x="111" y="424" font-size="9" fill="#854f0b" font-weight="500">1.8%</text><rect x="72" y="433" width="7.7" height="14" fill="#854f0b" opacity="0.8" rx="2"/><text x="68" y="444" text-anchor="end" font-size="10" fill="#2c2c2a">약촌교당</text><text x="84" y="444" font-size="9" fill="#854f0b" font-weight="500">0.4%</text><rect x="72" y="453" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="464" text-anchor="end" font-size="10" fill="#2c2c2a">경암교당</text><text x="76" y="464" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="473" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="484" text-anchor="end" font-size="10" fill="#2c2c2a">경장교당</text><text x="76" y="484" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="493" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="504" text-anchor="end" font-size="10" fill="#2c2c2a">나운교당</text><text x="76" y="504" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="513" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="524" text-anchor="end" font-size="10" fill="#2c2c2a">금마교당</text><text x="76" y="524" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="533" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="544" text-anchor="end" font-size="10" fill="#2c2c2a">삼기교당</text><text x="76" y="544" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="553" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="564" text-anchor="end" font-size="10" fill="#2c2c2a">대야교당</text><text x="76" y="564" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="573" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="584" text-anchor="end" font-size="10" fill="#2c2c2a">나포리교당</text><text x="76" y="584" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="593" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="604" text-anchor="end" font-size="10" fill="#2c2c2a">마동교당</text><text x="76" y="604" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="613" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="624" text-anchor="end" font-size="10" fill="#2c2c2a">만성교당</text><text x="76" y="624" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="633" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="644" text-anchor="end" font-size="10" fill="#2c2c2a">삼성교당</text><text x="76" y="644" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="653" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="664" text-anchor="end" font-size="10" fill="#2c2c2a">여산교당</text><text x="76" y="664" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="673" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="684" text-anchor="end" font-size="10" fill="#2c2c2a">신용교당</text><text x="76" y="684" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="693" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="704" text-anchor="end" font-size="10" fill="#2c2c2a">술산교당</text><text x="76" y="704" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="713" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="724" text-anchor="end" font-size="10" fill="#2c2c2a">신석교당</text><text x="76" y="724" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="733" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="744" text-anchor="end" font-size="10" fill="#2c2c2a">월명교당</text><text x="76" y="744" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="753" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="764" text-anchor="end" font-size="10" fill="#2c2c2a">함라교당</text><text x="76" y="764" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="773" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="784" text-anchor="end" font-size="10" fill="#2c2c2a">함열교당</text><text x="76" y="784" font-size="9" fill="#ccc" font-weight="500">0.0%</text><rect x="72" y="793" width="0.0" height="14" fill="#d3d1c7" opacity="0.8" rx="2"/><text x="68" y="804" text-anchor="end" font-size="10" fill="#2c2c2a">황등교당</text><text x="76" y="804" font-size="9" fill="#ccc" font-weight="500">0.0%</text></svg></div>
+    <div class="fn">
+      <span>· 비중(%) = (청년+학생+어린이 출석) ÷ 전체 출석 × 100. 충용교당 제외.</span>
+      <span>· 파랑 15%+: 임피·동영·영등·부송 (4개) / 초록 5~14%: 13개 / 주황 0~5%: 4개 / 회색 0%: 18개</span>
+      <div class="fn-def">
+        <span class="fn-title">📌 0%의 의미</span>
+        <span class="fn-item">· 0%는 청년·학생·어린이 법회에 단 한 명도 출석하지 않는 것입니다. 해당 교당의 법회는 완전히 성인(주로 50~70대)으로만 구성된 상태입니다.</span>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">연도별 비교</h3>
+    <table class="tbl">
+      <tr><th>연도</th><th>전체 주평균</th><th>일반(성인)</th><th>청년</th><th>학생</th><th>어린이</th><th>청소년이하 비중</th></tr>
+      <tr><td>90년</td><td>3,112명</td><td>2,402명</td><td>202명</td><td>159명</td><td>348명</td><td>22.8%</td></tr>
+      <tr><td>100년</td><td>3,239명</td><td>2,742명</td><td>149명</td><td>153명</td><td>194명</td><td>15.3%</td></tr>
+      <tr class="tot"><td>108년</td><td>2,222명</td><td>2,018명</td><td>65명</td><td>57명</td><td>83명</td><td class="dn">9.2%</td></tr>
+    </table>
+    <div class="fn"><span>· 주평균 출석 = 연간 법회 출석 합계 ÷ 52주. 충용교당(군종) 제외.</span></div>
+  </div>
+</div>
+
+<!-- ② 원인 분석 -->
+<div class="tp" id="t2">
+  <div class="shd"><span class="snum">원인</span><div><div class="sttl">왜 이렇게 됐는가</div><div class="ssub">외부 구조적 원인 + 내부 요인 + 교무님 연령 구조 분석</div></div></div>
+  <div class="note n-g">수치만 보면 원불교 교화 실패처럼 보이지만, 한국 사회 전체의 구조 변화가 훨씬 큰 원인입니다. 그러나 같은 조건에서도 교당마다 결과가 다른 것은 내부 요인이 작동한다는 의미입니다.</div>
+  <div class="g2">
+    <div class="card" style="margin:0;">
+      <h3 style="color:#a32d2d;margin-bottom:10px;">외부 요인 — 막을 수 없는 것들</h3>
+      <table class="tbl" style="font-size:12px;">
+        <tr><th>요인</th><th>내용</th><th>영향</th></tr>
+        <tr><td style="font-weight:600;">저출산 가속화</td><td style="text-align:left;">합계출산율 90년대 1.5 → 108년 0.72. 아이 자체가 줄어듦.</td><td class="dn">어린이 수요 구조 감소</td></tr>
+        <tr><td style="font-weight:600;">주말 사교육 급증</td><td style="text-align:left;">학원·스포츠·예체능이 주말을 채움.</td><td class="dn">학생·청소년 이탈</td></tr>
+        <tr><td style="font-weight:600;">대학생 종교 이탈</td><td style="text-align:left;">한국갤럽 2023: 20대 무종교 65%. 전 세대 최고.</td><td class="dn">청년 입교·출석 급감</td></tr>
+        <tr><td style="font-weight:600;">농촌 학령인구 소멸</td><td style="text-align:left;">군산·익산 농촌 초중고 폐교 가속.</td><td class="dn">농촌 교당 어린이 0</td></tr>
+      </table>
+    </div>
+    <div class="card" style="margin:0;">
+      <h3 style="color:#854f0b;margin-bottom:10px;">내부 요인 — 바꿀 수 있는 것들</h3>
+      <table class="tbl" style="font-size:12px;">
+        <tr><th>요인</th><th>내용</th><th>영향</th></tr>
+        <tr><td style="font-weight:600;">어린이법회 운영 감소</td><td style="text-align:left;">운영 교당 26개→19개. 교당당 출석 696→228회/년. 이중 감소.</td><td class="dn">공급 자체가 줄어듦</td></tr>
+        <tr><td style="font-weight:600;">청년 맞춤 프로그램 부재</td><td style="text-align:left;">기존 법회 형식이 중장년 중심. 20~30대에 맞는 시간대·방식이 없음.</td><td class="dn">입교 후 이탈 빠름</td></tr>
+        <tr><td style="font-weight:600;">가족 단위 교화 약화</td><td style="text-align:left;">부모 출석이 줄면서 자녀 동반 출석도 연쇄 감소.</td><td class="dn">어린이 출석 연쇄 감소</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:10px;">교무님 연령 구조 — 데이터로 확인한 것</h3>
+    <div class="note n-b">
+      <strong>중요한 전제:</strong> 교무님 연령이 높다고 무조건 청소년 교화에 불리하지 않습니다. 청소년보다 10살 위에 계신 교무님이 형·삼촌 같은 역할로 더 자연스럽게 이끄는 경우도 있습니다. 데이터는 35~44세 교무님이 배치된 교당에서 청소년 출석 비중이 가장 높다는 것을 보여줍니다.
+    </div>
+    <div class="g2">
+      <div>
+        <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 148" style="width:100%" role="img"><title>청소년 담당 교무 연령대별 청소년 출석 비중 평균(%)</title><line x1="72" y1="26" x2="72" y2="132" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="210" y1="26" x2="210" y2="132" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="348" y1="26" x2="348" y2="132" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="487" y1="26" x2="487" y2="132" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="625" y1="26" x2="625" y2="132" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="348.5" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">청소년 담당 교무 연령대별 청소년 출석 비중 평균(%)</text><rect x="72" y="33" width="480.4" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="44" text-anchor="end" font-size="10" fill="#2c2c2a">청소년 담당 교무님
+35세 미만</text><text x="556" y="44" font-size="9" fill="#185fa5" font-weight="500">10.8%</text><rect x="72" y="53" width="493.7" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="64" text-anchor="end" font-size="10" fill="#2c2c2a">청소년 담당 교무님
+35~44세</text><text x="570" y="64" font-size="9" fill="#185fa5" font-weight="500">11.1%</text><rect x="72" y="73" width="387.0" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="84" text-anchor="end" font-size="10" fill="#2c2c2a">청소년 담당 교무님
+45~54세</text><text x="463" y="84" font-size="9" fill="#3b6d11" font-weight="500">8.7%</text><rect x="72" y="93" width="93.4" height="14" fill="#888780" opacity="0.8" rx="2"/><text x="68" y="104" text-anchor="end" font-size="10" fill="#2c2c2a">청소년 담당 교무님
+55세 이상</text><text x="169" y="104" font-size="9" fill="#888780" font-weight="500">2.1%</text></svg></div>
+        <div class="fn">
+          <span>· 분석 방법: 전무출신기본정보.xlsx(출생년도) × 교당근무자data97108.xlsx(108년 근무지) 병합 → 교당별 청소년 담당 교무님 연령 산출.</span>
+          <span>· 청소년 비중 = (청년+학생+어린이출석) ÷ 전체출석 × 100 (법회출석90108long2.csv).</span>
+          <span>· 청소년 담당 교무님 연령 vs 청소년 비중 상관계수: -0.52 (p=0.001) — 통계적으로 유의미.</span>
+          <div class="fn-def">
+            <span class="fn-title">📌 어떻게 읽는가</span>
+            <span class="fn-item">· 청소년 담당 교무님이 35~44세인 교당의 청소년 비중 평균 11.1%로 가장 높습니다.</span>
+            <span class="fn-item">· 35세 미만(10.8%)과 비슷. 20~30대 청소년과 10살 위 관계가 효과적임을 시사합니다.</span>
+            <span class="fn-item">· 단, 교무님 연령 외에 지역(신시가지 vs 농촌)도 영향을 줍니다. 단독 원인이 아님.</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <table class="tbl" style="font-size:12px;margin-bottom:8px;">
+          <tr><th>현직 교무님 연령 분포</th><th>비율</th></tr>
+          <tr><td>25~34세</td><td>7.5%</td></tr>
+          <tr><td>35~44세</td><td>17.0%</td></tr>
+          <tr><td>45~54세</td><td>27.7%</td></tr>
+          <tr><td>55~64세</td><td>32.0%</td></tr>
+          <tr><td>65세 이상</td><td>15.8%</td></tr>
+          <tr class="tot"><td>전국 현직 교무님 평균 나이</td><td>52.6세</td></tr>
+        </table>
+        <div class="note n-a" style="font-size:12px;">
+          <strong>해석 주의:</strong> 신시가지에 젊은 교무님이 배치되는 경향이 있어, 인구 구조와 교무님 연령이 동시에 작용할 수 있습니다. 그럼에도 35~44세 교무님 배치가 청소년 교화에 긍정적이라는 방향은 현장 경험과도 일치합니다.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">법회 운영 교당 수 추이</h3>
+    <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" style="width:100%" role="img"><title>법회 운영 교당 수 추이 (전체 39개 중)</title><line x1="50" y1="34" x2="666" y2="34" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="38" text-anchor="end" font-size="9.5" fill="#999">40</text><line x1="50" y1="66" x2="666" y2="66" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="70" text-anchor="end" font-size="9.5" fill="#999">30</text><line x1="50" y1="98" x2="666" y2="98" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="102" text-anchor="end" font-size="9.5" fill="#999">20</text><line x1="50" y1="130" x2="666" y2="130" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="134" text-anchor="end" font-size="9.5" fill="#999">10</text><line x1="50" y1="162" x2="666" y2="162" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="166" text-anchor="end" font-size="9.5" fill="#999">0</text><text x="50" y="175" text-anchor="middle" font-size="9.5" fill="#999">90년</text><text x="173" y="175" text-anchor="middle" font-size="9.5" fill="#999">95년</text><text x="296" y="175" text-anchor="middle" font-size="9.5" fill="#999">100년</text><text x="420" y="175" text-anchor="middle" font-size="9.5" fill="#999">104년</text><text x="543" y="175" text-anchor="middle" font-size="9.5" fill="#999">107년</text><text x="666" y="175" text-anchor="middle" font-size="9.5" fill="#999">108년</text><polygon points="50.0,78.8 173.2,85.2 296.4,94.8 419.6,98.0 542.8,98.0 666.0,101.2 666.0,162 50.0,162" fill="#854f0b" fill-opacity="0.12"/><polyline points="50.0,78.8 173.2,85.2 296.4,94.8 419.6,98.0 542.8,98.0 666.0,101.2" stroke="#854f0b" stroke-width="2.5" fill="none" /><circle cx="50.0" cy="78.8" r="4" fill="#854f0b"/><circle cx="173.2" cy="85.2" r="4" fill="#854f0b"/><circle cx="296.4" cy="94.8" r="4" fill="#854f0b"/><circle cx="419.6" cy="98.0" r="4" fill="#854f0b"/><circle cx="542.8" cy="98.0" r="4" fill="#854f0b"/><circle cx="666.0" cy="101.2" r="4" fill="#854f0b"/><polyline points="50.0,82.0 173.2,94.8 296.4,114.0 419.6,104.4 542.8,104.4 666.0,114.0" stroke="#3b6d11" stroke-width="2" fill="none" stroke-dasharray="5,4"/><circle cx="50.0" cy="82.0" r="4" fill="#3b6d11"/><circle cx="173.2" cy="94.8" r="4" fill="#3b6d11"/><circle cx="296.4" cy="114.0" r="4" fill="#3b6d11"/><circle cx="419.6" cy="104.4" r="4" fill="#3b6d11"/><circle cx="542.8" cy="104.4" r="4" fill="#3b6d11"/><circle cx="666.0" cy="114.0" r="4" fill="#3b6d11"/><polyline points="50.0,104.4 173.2,98.0 296.4,104.4 419.6,107.6 542.8,107.6 666.0,110.8" stroke="#185fa5" stroke-width="2" fill="none" stroke-dasharray="5,4"/><circle cx="50.0" cy="104.4" r="4" fill="#185fa5"/><circle cx="173.2" cy="98.0" r="4" fill="#185fa5"/><circle cx="296.4" cy="104.4" r="4" fill="#185fa5"/><circle cx="419.6" cy="107.6" r="4" fill="#185fa5"/><circle cx="542.8" cy="107.6" r="4" fill="#185fa5"/><circle cx="666.0" cy="110.8" r="4" fill="#185fa5"/><text x="340.0" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">법회 운영 교당 수 추이 (전체 39개 중)</text><line x1="50" y1="27" x2="66" y2="27" stroke="#854f0b" stroke-width="2.5"/><circle cx="58" cy="27" r="3" fill="#854f0b"/><text x="72" y="31" font-size="10" fill="#555">어린이법회 운영 교당</text><line x1="158" y1="27" x2="174" y2="27" stroke="#3b6d11" stroke-width="2.5"/><circle cx="166" cy="27" r="3" fill="#3b6d11"/><text x="180" y="31" font-size="10" fill="#555">학생법회 운영 교당</text><line x1="260" y1="27" x2="276" y2="27" stroke="#185fa5" stroke-width="2.5"/><circle cx="268" cy="27" r="3" fill="#185fa5"/><text x="282" y="31" font-size="10" fill="#555">청년법회 운영 교당</text></svg></div>
+    <div class="fn">
+      <span>· 해당 연도에 해당 구분(어린이/학생/청년) 출석수 &gt;0인 교당 수.</span>
+      <span>· 어린이법회 운영 교당: 26→19개(-27%). 교당당 연간 출석: 696→228회(-67%). 두 가지 동시 감소 = 이중 위기.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ③ 심층 분석 -->
+<div class="tp" id="t3">
+  <div class="shd"><span class="snum">심층</span><div><div class="sttl">3가지 심층 분석 — 데이터로 검증한 것들</div><div class="ssub">군종교당 정착률 · 어린이→성인 잔류 · 관리교도 고령화</div></div></div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">분석 A — 군종교당 입교자, 제대 후 얼마나 남는가</h3>
+    <div class="note n-r"><strong>핵심 발견:</strong> 군 복무 중 입교한 분들이 입교 후 10~14년이 지나면 17.8%만 관리교도로 남습니다. 15년 후에는 0.3%로 사실상 소멸합니다. 전역 후 지역 교당과 연결이 끊어지는 것이 원인입니다.</div>
+    <div class="g2">
+      <div>
+        <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" style="width:100%" role="img"><title>군종교당 입교 후 경과 연수별 정착률(%)</title><line x1="50" y1="34" x2="666" y2="34" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="38" text-anchor="end" font-size="9.5" fill="#999">110</text><line x1="50" y1="66" x2="666" y2="66" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="70" text-anchor="end" font-size="9.5" fill="#999">82</text><line x1="50" y1="98" x2="666" y2="98" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="102" text-anchor="end" font-size="9.5" fill="#999">55</text><line x1="50" y1="130" x2="666" y2="130" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="134" text-anchor="end" font-size="9.5" fill="#999">28</text><line x1="50" y1="162" x2="666" y2="162" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="46" y="166" text-anchor="end" font-size="9.5" fill="#999">0</text><text x="50" y="175" text-anchor="middle" font-size="9.5" fill="#999">0~1년</text><text x="204" y="175" text-anchor="middle" font-size="9.5" fill="#999">2~4년</text><text x="358" y="175" text-anchor="middle" font-size="9.5" fill="#999">5~9년</text><text x="512" y="175" text-anchor="middle" font-size="9.5" fill="#999">10~14년</text><text x="666" y="175" text-anchor="middle" font-size="9.5" fill="#999">15~19년</text><polygon points="50.0,47.4 204.0,56.2 358.0,62.3 512.0,141.3 666.0,161.7 666.0,162 50.0,162" fill="#185fa5" fill-opacity="0.12"/><polyline points="50.0,47.4 204.0,56.2 358.0,62.3 512.0,141.3 666.0,161.7" stroke="#185fa5" stroke-width="3" fill="none" /><circle cx="50.0" cy="47.4" r="5" fill="#185fa5"/><circle cx="204.0" cy="56.2" r="5" fill="#185fa5"/><circle cx="358.0" cy="62.3" r="5" fill="#185fa5"/><circle cx="512.0" cy="141.3" r="5" fill="#185fa5"/><circle cx="666.0" cy="161.7" r="5" fill="#185fa5"/><text x="340.0" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">군종교당 입교 후 경과 연수별 정착률(%)</text><line x1="50" y1="27" x2="66" y2="27" stroke="#185fa5" stroke-width="2.5"/><circle cx="58" cy="27" r="3" fill="#185fa5"/><text x="72" y="31" font-size="10" fill="#555">입교 후 경과연수별 관리(정착) 비율</text></svg></div>
+        <div class="fn">
+          <span>· 분석 데이터: 군종교당입교데이터.csv (38,183명) + data_member.csv (교도번호 기준 연결)</span>
+          <span>· 관리구분: '관리' = 현재 지역 교당 관리교도(정착), '미관리' = 비활동(이탈)</span>
+          <span>· X축 = 입교 시점부터 108년(2023년)까지의 경과 연수 구간.</span>
+          <div class="fn-def">
+            <span class="fn-title">📌 읽는 법</span>
+            <span class="fn-item">· 군 복무 중 입교한 분이 제대 후 시간이 지날수록 관리교도(정착)로 남아있는 비율입니다.</span>
+            <span class="fn-item">· 0~4년: 90%+로 높음 → 아직 군에 있거나 막 전역.</span>
+            <span class="fn-item">· 10년 후부터 급락 → 취업·결혼·이사 등 생활 변화로 교당과 연결 끊어짐.</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <table class="tbl" style="font-size:12px;">
+          <tr><th>입교 후 경과</th><th>입교 수</th><th>현재 관리</th><th>정착률</th></tr>
+          <tr><td>0~1년</td><td>1,011명</td><td>996명</td><td class="up">98.5%</td></tr>
+          <tr><td>2~4년</td><td>2,134명</td><td>1,940명</td><td class="up">90.9%</td></tr>
+          <tr><td>5~9년</td><td>11,990명</td><td>10,279명</td><td style="color:#854f0b;font-weight:600;">85.7%</td></tr>
+          <tr><td>10~14년</td><td>13,306명</td><td>2,375명</td><td class="dn">17.8%</td></tr>
+          <tr><td>15~19년</td><td>9,723명</td><td>28명</td><td class="dn">0.3%</td></tr>
+          <tr class="tot"><td>전체</td><td>38,183명</td><td>15,620명</td><td>40.9%</td></tr>
+        </table>
+        <div class="fn"><span>· 충용교당(중앙교구)은 5~9년 정착률 99.8%로 전국 최고. 그러나 10~14년 후 10.4%로 전국 평균(17.8%)보다 오히려 더 낮게 급락합니다.</span></div>
+      </div>
+    </div>
+    <div class="find-card fc-r">
+      <div class="fc-title" style="color:#a32d2d;">대응 방향 — 전역 전 연결이 핵심입니다</div>
+      <div class="fc-body">전역 2~3개월 전 출신 지역 교당에 자동 안내. 담당 교무님이 전역 환영 연락. 전역자 초대 특별법회. 이 세 가지만 해도 10년 후 정착률을 크게 높일 수 있습니다. 38,183명이 이미 원불교와 인연이 있는 분들입니다.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">분석 B — 어린이 때 입교한 분들, 성인 후 얼마나 남는가</h3>
+    <div class="note n-a"><strong>예상과 다른 발견:</strong> "어린이 때 교당에 다니면 평생 교도"라는 통념이 데이터상으로는 지지되지 않습니다. 어린이(~13세) 입교자의 잔류율(16.2%)은 성인 입교(20.8%)보다 낮습니다. 단, 데이터 한계를 반드시 고려해야 합니다.</div>
+    <div class="g2">
+      <div>
+        <div class="cv"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 232" style="width:100%" role="img"><title>입교 연령대별 현재 관리교도 잔류율 (%)</title><line x1="72" y1="26" x2="72" y2="216" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="210" y1="26" x2="210" y2="216" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="348" y1="26" x2="348" y2="216" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="487" y1="26" x2="487" y2="216" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><line x1="625" y1="26" x2="625" y2="216" stroke="rgba(0,0,0,0.07)" stroke-width="1"/><text x="348.5" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">입교 연령대별 현재 관리교도 잔류율 (%)</text><rect x="72" y="33" width="291.5" height="14" fill="#854f0b" opacity="0.8" rx="2"/><text x="68" y="44" text-anchor="end" font-size="10" fill="#2c2c2a">~7세 입교</text><text x="367" y="44" font-size="9" fill="#854f0b" font-weight="500">14.7%</text><rect x="72" y="53" width="329.2" height="14" fill="#854f0b" opacity="0.8" rx="2"/><text x="68" y="64" text-anchor="end" font-size="10" fill="#2c2c2a">8~10세 입교</text><text x="405" y="64" font-size="9" fill="#854f0b" font-weight="500">16.6%</text><rect x="72" y="73" width="396.6" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="84" text-anchor="end" font-size="10" fill="#2c2c2a">11~13세 입교</text><text x="473" y="84" font-size="9" fill="#185fa5" font-weight="500">20.0%</text><rect x="72" y="93" width="432.3" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="104" text-anchor="end" font-size="10" fill="#2c2c2a">14~15세 입교</text><text x="508" y="104" font-size="9" fill="#185fa5" font-weight="500">21.8%</text><rect x="72" y="113" width="440.2" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="124" text-anchor="end" font-size="10" fill="#2c2c2a">16~17세 입교</text><text x="516" y="124" font-size="9" fill="#185fa5" font-weight="500">22.2%</text><rect x="72" y="133" width="432.3" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="144" text-anchor="end" font-size="10" fill="#2c2c2a">18~24세 입교</text><text x="508" y="144" font-size="9" fill="#185fa5" font-weight="500">21.8%</text><rect x="72" y="153" width="440.2" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="164" text-anchor="end" font-size="10" fill="#2c2c2a">25~34세 입교</text><text x="516" y="164" font-size="9" fill="#185fa5" font-weight="500">22.2%</text><rect x="72" y="173" width="368.8" height="14" fill="#3b6d11" opacity="0.8" rx="2"/><text x="68" y="184" text-anchor="end" font-size="10" fill="#2c2c2a">35~49세 입교</text><text x="445" y="184" font-size="9" fill="#3b6d11" font-weight="500">18.6%</text><rect x="72" y="193" width="493.7" height="14" fill="#185fa5" opacity="0.8" rx="2"/><text x="68" y="204" text-anchor="end" font-size="10" fill="#2c2c2a">50세 이상 입교</text><text x="570" y="204" font-size="9" fill="#185fa5" font-weight="500">24.9%</text></svg></div>
+        <div class="fn">
+          <span>· 분석 데이터: data_member.csv 446,488명 중 생년+입교일자 유효한 204,420명(45.8%) 분석.</span>
+          <span>· 잔류율 = 현재(108년) 관리구분 '관리' 비율. 현재 20세 이상인 경우만 포함.</span>
+          <span>· 입교연령 = 입교년도 - 출생년도로 산출 (전국 데이터, 중앙교구만이 아님).</span>
+          <div class="fn-def">
+            <span class="fn-title">📌 데이터 한계 (중요)</span>
+            <span class="fn-item">· 2000년 이후 입교자의 생년 기록이 45.8%만 있어 분석 대상이 제한됩니다.</span>
+            <span class="fn-item">· '관리'/'미관리'는 행정적 구분. 미관리여도 신앙생활을 하는 경우가 있습니다.</span>
+            <span class="fn-item">· 어린이 때 경험 자체의 가치(기억, 정체성)는 이 수치에 반영되지 않습니다.</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <table class="tbl" style="font-size:12px;">
+          <tr><th>입교 연령</th><th>현재 성인 수</th><th>잔류율</th></tr>
+          <tr><td>~7세 입교</td><td>36,492명</td><td class="dn">14.7%</td></tr>
+          <tr><td>8~10세 입교</td><td>15,629명</td><td style="color:#854f0b;font-weight:600;">16.6%</td></tr>
+          <tr><td>11~13세 입교</td><td>13,633명</td><td>20.0%</td></tr>
+          <tr><td>18~24세 입교</td><td>26,324명</td><td>21.8%</td></tr>
+          <tr><td>25~34세 입교</td><td>32,398명</td><td>22.2%</td></tr>
+          <tr class="tot"><td>성인 입교 평균</td><td>—</td><td>20.8%</td></tr>
+        </table>
+        <div class="find-card fc-a" style="margin-top:8px;font-size:12px;">
+          <strong>해석 주의:</strong> 낮은 잔류율의 원인 중 하나는 80~90년대 어린이 입교자(현재 40~50대)가 오랜 시간이 지나 이탈이 쌓인 것입니다. 어린이 교화 자체의 실패가 아닐 수 있습니다.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">분석 C — 관리교도 연령 구조: 이미 역전됐습니다</h3>
+    <div class="g2">
+      <div class="cv" style="margin:0;text-align:center;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 230" style="width:100%" role="img"><title>관리교도 연령대 분포</title><text x="150.0" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#2c2c2a">관리교도 연령대 분포</text><path d="M150.0,57.0 A68,68 0 0,1 163.6,58.4 L157.6,87.8 A38,38 0 0,0 150.0,87.0 Z" fill="#d3d1c7" opacity="0.85"/><path d="M163.6,58.4 A68,68 0 0,1 196.9,75.7 L176.2,97.5 A38,38 0 0,0 157.6,87.8 Z" fill="#854f0b" opacity="0.85"/><text x="175" y="82" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">9%</text><path d="M196.9,75.7 A68,68 0 0,1 217.2,114.8 L187.6,119.3 A38,38 0 0,0 176.2,97.5 Z" fill="#185fa5" opacity="0.85"/><text x="197" y="104" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">10%</text><path d="M217.2,114.8 A68,68 0 0,1 210.0,157.0 L183.5,142.9 A38,38 0 0,0 187.6,119.3 Z" fill="#3b8a2a" opacity="0.85"/><text x="202" y="138" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">10%</text><path d="M210.0,157.0 A68,68 0 0,1 167.3,190.8 L159.7,161.7 A38,38 0 0,0 183.5,142.9 Z" fill="#5c5c5a" opacity="0.85"/><text x="183" y="171" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">13%</text><path d="M167.3,190.8 A68,68 0 0,1 97.9,168.7 L120.9,149.4 A38,38 0 0,0 159.7,161.7 Z" fill="#888780" opacity="0.85"/><text x="134" y="180" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">18%</text><path d="M97.9,168.7 A68,68 0 0,1 90.2,92.6 L116.6,106.9 A38,38 0 0,0 120.9,149.4 Z" fill="#b4b2a9" opacity="0.85"/><text x="97" y="134" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">19%</text><path d="M90.2,92.6 A68,68 0 0,1 121.4,63.3 L134.0,90.5 A38,38 0 0,0 116.6,106.9 Z" fill="#c8c5bc" opacity="0.85"/><text x="114" y="90" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">10%</text><path d="M121.4,63.3 A68,68 0 0,1 150.0,57.0 L150.0,87.0 A38,38 0 0,0 134.0,90.5 Z" fill="#ede9e0" opacity="0.85"/><text x="139" y="77" text-anchor="middle" font-size="8.5" fill="#fff" font-weight="600">7%</text><rect x="8" y="100" width="9" height="9" fill="#d3d1c7" opacity="0.85" rx="2"/><text x="21" y="108" font-size="9" fill="#555">10세미만 3%</text><rect x="8" y="114" width="9" height="9" fill="#854f0b" opacity="0.85" rx="2"/><text x="21" y="122" font-size="9" fill="#555">10대 9%</text><rect x="8" y="128" width="9" height="9" fill="#185fa5" opacity="0.85" rx="2"/><text x="21" y="136" font-size="9" fill="#555">20대 10%</text><rect x="8" y="142" width="9" height="9" fill="#3b8a2a" opacity="0.85" rx="2"/><text x="21" y="150" font-size="9" fill="#555">30대 10%</text><rect x="8" y="156" width="9" height="9" fill="#5c5c5a" opacity="0.85" rx="2"/><text x="21" y="164" font-size="9" fill="#555">40대 13%</text><rect x="8" y="170" width="9" height="9" fill="#888780" opacity="0.85" rx="2"/><text x="21" y="178" font-size="9" fill="#555">50대 18%</text><rect x="8" y="184" width="9" height="9" fill="#b4b2a9" opacity="0.85" rx="2"/><text x="21" y="192" font-size="9" fill="#555">60대 19%</text><rect x="8" y="198" width="9" height="9" fill="#c8c5bc" opacity="0.85" rx="2"/><text x="21" y="206" font-size="9" fill="#555">70대 10%</text><rect x="8" y="212" width="9" height="9" fill="#ede9e0" opacity="0.85" rx="2"/><text x="21" y="220" font-size="9" fill="#555">80대이상 7%</text></svg></div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="kpi" style="border-top:3px solid #a32d2d;"><label>고령화 지수</label><div class="v dn">1.10</div><div class="s">60세+(36.1%) &gt; 40세 미만(32.8%)<br>이미 역전됨</div></div>
+        <div class="kpi" style="border-top:3px solid #185fa5;"><label>20~30대 비중</label><div class="v" style="color:#185fa5;">20.7%</div><div class="s">입교 시 40년+ 교도 가능</div></div>
+        <div class="kpi" style="border-top:3px solid #888780;"><label>50~60대 비중</label><div class="v" style="color:#888780;">37.0%</div><div class="s">10~20년 내 자연 감소 예정</div></div>
+      </div>
+    </div>
+    <div class="fn">
+      <span>· 중앙교구 입교 관리교도 중 생년 기록 유효 11,814명 기준. 현재 연령 = 2023 - 생년.</span>
+      <span>· 고령화 지수 = 60세 이상 ÷ 40세 미만. 1.0 초과면 고령층이 청장년층보다 많음.</span>
+      <span>· 지금의 50~60대가 향후 10~20년 안에 자연 감소하면, 그것이 다음 출석 급감의 원인이 됩니다.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ④ 사례 분석 -->
+<div class="tp" id="t4">
+  <div class="shd"><span class="snum">사례</span><div><div class="sttl">청소년 비중이 높은 교당 — 무엇이 다른가</div><div class="ssub">상위 교당 심층 분석 · 공통 요인 추출</div></div></div>
+  <div class="note n-g">동영교당(22.9%), 영등교당(17.1%), 부송교당(15.6%), 북일교당(12.8%)은 비슷한 환경에서도 청소년 비중을 유지하고 있습니다. 공통점을 추출합니다.</div>
+  <div class="g2">
+    <div class="find-card fc-b" style="margin:0;">
+      <div class="fc-title" style="color:#185fa5;">동영교당 — 22.9%</div>
+      <div class="fc-body">
+        <strong>입지:</strong> 이리 신시가지(영등·어양동) 인접. 30~40대 젊은 가족 밀집.<br>
+        <strong>특징:</strong> 청년(306명)·학생(194명)·어린이(330명) 3개 구분 모두 상위권.<br>
+        <strong>교무님 구성:</strong> 두 분 배치, 막내 43세. 20대 청소년과 20살 위 '삼촌' 관계.<br>
+        <strong>18년 추이:</strong> 90년 30% → 108년 23%. 전국 추세 대비 감소폭 절반.
+      </div>
+    </div>
+    <div class="find-card fc-t" style="margin:0;">
+      <div class="fc-title" style="color:#3b6d11;">영등교당 — 17.1%</div>
+      <div class="fc-body">
+        <strong>입지:</strong> 영등동 신시가지 핵심. 최근 5년 교구 내 최고 성장(+61명).<br>
+        <strong>특징:</strong> 학생 출석 261명으로 중앙교구 전체 1위. 중학생 교화 강점.<br>
+        <strong>교무님 구성:</strong> 한 분 배치, 61세. 그럼에도 비중 높은 것은 신시가지 입지가 주요 요인.<br>
+        <strong>주목:</strong> 교무님 연령보다 지역 인구 구조의 영향이 더 클 수 있는 사례.
+      </div>
+    </div>
+    <div class="find-card fc-t" style="margin:0;">
+      <div class="fc-title" style="color:#3b6d11;">북일교당 — 12.8%</div>
+      <div class="fc-body">
+        <strong>입지:</strong> 이리 구도심. 원광대·원광보건대 인근 → 대학생 접점.<br>
+        <strong>특징:</strong> 청년 485명으로 중앙교구 절대 규모 1위. 세 분 배치.<br>
+        <strong>교무님 구성:</strong> 막내 29세. 대학생(20~24세)과 5~10살 차이. 실질적인 '형·오빠' 관계.<br>
+        <strong>시사점:</strong> 대학교 캠퍼스 인접 교당의 청년 교화 잠재력이 가장 큼.
+      </div>
+    </div>
+    <div class="find-card fc-a" style="margin:0;">
+      <div class="fc-title" style="color:#854f0b;">임피교당 — 25.5% (비중 1위)</div>
+      <div class="fc-body">
+        <strong>특이:</strong> 청년·학생 0인데 어린이 393명으로 1위. 전형적 패턴과 다름.<br>
+        <strong>유추:</strong> 인근 원불교 관련 어린이집·유치원과 연계 가능성 높음.<br>
+        <strong>확인 필요:</strong> 어린이출석이 실제 어린이법회 참석인지, 교육기관 연계 수치인지 검증 필요.<br>
+        <strong>시사점:</strong> 복지·교육기관 연계가 농촌 어린이 교화의 현실적 대안.
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:10px;">
+    <h3 style="margin-bottom:8px;">사례에서 뽑은 공통점 — 다른 교당에 적용 가능한 것</h3>
+    <table class="tbl">
+      <tr><th>요소</th><th>동영</th><th>영등</th><th>북일</th><th>적용 가능성</th></tr>
+      <tr><td style="font-weight:600;">신시가지·젊은 인구 입지</td><td>✅</td><td>✅</td><td>△</td><td style="text-align:left;font-size:12px;">이전 불가. 거점 선택 시 고려.</td></tr>
+      <tr><td style="font-weight:600;">어린이·청년 법회 별도 운영</td><td>✅</td><td>✅</td><td>✅</td><td style="text-align:left;font-size:12px;"><strong>즉시 적용 가능.</strong> 주말 별도 시간대 신설.</td></tr>
+      <tr><td style="font-weight:600;">35~44세 교무님 배치</td><td>✅</td><td>—</td><td>△</td><td style="text-align:left;font-size:12px;"><strong>인사 배치 시 고려.</strong> 청소년과 10살 위 관계.</td></tr>
+      <tr><td style="font-weight:600;">대학·학교와 연계</td><td>△</td><td>✅</td><td>✅</td><td style="text-align:left;font-size:12px;"><strong>거점 교당에서 추진 가능.</strong> 원광대·원광보건대.</td></tr>
+      <tr><td style="font-weight:600;">복지·교육기관 연계</td><td>△</td><td>△</td><td>△</td><td style="text-align:left;font-size:12px;"><strong>농촌 교당 현실적 대안.</strong> 어린이집·방과후 연계.</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ⑤ 대안·전략 -->
+<div class="tp" id="t5">
+  <div class="shd"><span class="snum">전략</span><div><div class="sttl">무엇을 해야 하는가</div><div class="ssub">교당 유형별 차별화 · 군종교당 연계 포함 · 단기·중기·장기 구분</div></div></div>
+  <div class="note n-g"><strong>전제:</strong> 저출산·사교육 증가는 막을 수 없습니다. "절대 수를 늘린다"보다 <strong>"교화의 씨앗을 유지하고 새로운 접점을 만든다"</strong>는 방향이 현실적입니다. 잘 되는 곳에 집중하고, 회복이 어려운 곳은 다른 방식을 씁니다.</div>
+  <div class="sc sc1">
+    <div class="sc-h" style="color:#185fa5;">전략 A — 거점 교당 청년·어린이 법회 집중 강화 (즉시)</div>
+    <p class="sc-b">동영·영등·북일·남중·이리 등 이미 청소년 비중이 있는 교당에 자원을 집중합니다. 39개 교당에 고루 나누면 아무 곳에서도 성과가 나지 않습니다.</p>
+    <div class="sc-g">
+      <div class="sc-i"><div class="sc-in">어린이·청년 법회 별도 시간 신설</div>기존 일반 법회와 분리된 시간대. 교무님 두 분+ 교당에서 즉시 가능. 주말 오전 어린이, 오후 청년.</div>
+      <div class="sc-i"><div class="sc-in">어양교당 청년특화 시범 운영</div>최근 5년 교구 내 최고 성장 교당. 저녁 법회 신설 + 마음공부 소그룹 → 20~30대 직장인 타깃.</div>
+      <div class="sc-i"><div class="sc-in">북일교당 대학생 교화 집중</div>원광대·원광보건대 인근. 교내 마음공부 클럽, 신입생 행사 연계. 청소년 담당 교무님(29세)이 강점.</div>
+      <div class="sc-i"><div class="sc-in">어린이법회 프로그램 표준화</div>동영·영등 사례를 모델로 표준 프로그램 개발. 교무님이 바뀌어도 연속성 유지.</div>
+    </div>
+  </div>
+  <div class="sc sc2">
+    <div class="sc-h" style="color:#3b6d11;">전략 B — 군종교당 전역자 연계 체계 구축 (1~2년)</div>
+    <p class="sc-b">군종교당 입교자 38,183명 중 10년 후 0.3%만 남습니다. 전역 후 지역 교당 연결이 없는 것이 핵심 문제입니다. 전역 전 단계에서 연결하면 상당수를 붙잡을 수 있습니다.</p>
+    <div class="sc-g">
+      <div class="sc-i"><div class="sc-in">전역 전 지역 교당 연결</div>전역 2~3개월 전 출신 지역 교당에 자동 안내. 담당 교무님이 전역 환영 연락.</div>
+      <div class="sc-i"><div class="sc-in">전역자 특별 법회</div>정기적으로 전역자 초대 법회. 군종교당 시절 인연 교무님 참석. 소속감 재형성.</div>
+      <div class="sc-i"><div class="sc-in">충용교당-중앙교구 연계 강화</div>충용교당 입교 4,022명 중 10~14년 후 정착률 10.4%. 전역자 연계 담당자 지정 권고.</div>
+      <div class="sc-i"><div class="sc-in">청년 교화단 조직</div>전역 후 20대 교도들이 모일 수 있는 청년 교화단. 동년배 연결이 핵심.</div>
+    </div>
+  </div>
+  <div class="sc sc3">
+    <div class="sc-h" style="color:#854f0b;">전략 C — 개방형 프로그램으로 새 인연 (2~3년)</div>
+    <p class="sc-b">"법회에 오세요"만으로는 20~40대와 접점을 만들기 어렵습니다. 원불교의 가치를 먼저 경험하게 하는 개방형 프로그램으로 진입 문턱을 낮춥니다.</p>
+    <div class="sc-g">
+      <div class="sc-i"><div class="sc-in">마음공부 오픈 클래스</div>명상·감정조절·대화법 6~8주. 지역 문화센터 운영. 종교 입문이 아닌 삶의 도움으로 접근.</div>
+      <div class="sc-i"><div class="sc-in">원불교 복지기관 연계</div>어린이집·복지관·학교와 협력. 가족 단위 프로그램. 이미 있는 네트워크 활용.</div>
+      <div class="sc-i"><div class="sc-in">입교 후 정착 지원</div>새 교도 전담 교화단원 지정. 3·6·12개월 체크인. 첫 1년이 이탈 고위험 구간.</div>
+      <div class="sc-i"><div class="sc-in">35~44세 교무님 청소년 거점 배치 고려</div>데이터상 이 연령대 청소년 담당 교무님이 있는 교당의 청소년 비중이 가장 높음. 신시가지 거점 배치 우선 고려.</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">교당 유형별 현실적 목표</h3>
+    <table class="tbl">
+      <tr><th>교당 유형</th><th>대표 교당</th><th>현실적 목표</th><th>핵심 전략</th></tr>
+      <tr><td style="font-weight:600;">신시가지 거점</td><td>어양·영등·동영</td><td style="text-align:left;">청소년 비중 20%+ 유지·성장</td><td style="text-align:left;">청년·어린이 법회 분리, 대학 연계, 오픈 프로그램</td></tr>
+      <tr><td style="font-weight:600;">도심 대형</td><td>이리·남중·북일</td><td style="text-align:left;">청소년 비중 10%+ 회복</td><td style="text-align:left;">시간대 다양화, 대학 캠퍼스 교화, 청년 특화 법회</td></tr>
+      <tr><td style="font-weight:600;">도심 중형</td><td>모현·서이리·금강</td><td style="text-align:left;">현 수준 유지 (5~15%)</td><td style="text-align:left;">어린이법회 프로그램 표준화, 복지기관 연계</td></tr>
+      <tr><td style="font-weight:600;">농촌·구도심 소형</td><td>함열·술산·경장 등</td><td style="text-align:left;">0% 탈피보다 관계 유지</td><td style="text-align:left;">어린이집 연계, 거점 교당 법회로 연결</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ⑥ 핵심 요약 -->
+<div class="tp" id="t6">
+<div style="max-width:700px;margin:0 auto;">
+  <p style="font-size:13px;color:#73726c;margin-bottom:24px;">바쁘신 분들을 위한 핵심 요약입니다. 각 주제별로 한 줄 결론과 상세 설명을 담았습니다.</p>
+  <div class="sum-sec">
+    <div class="sum-title">1. 지금 얼마나 심각한가</div>
+    <div class="sum-box"><div class="sum-box-label">한 줄 결론</div><div class="sum-box-text">어린이 출석이 18년간 -76% 줄었습니다. 성인(-16%)의 5배 속도입니다. 39개 교당 중 18개는 청소년 출석이 0입니다.</div></div>
+    <div class="sum-body">
+      <p>원기 90년(2005년)에 매주 평균 348명의 어린이가 법회에 나왔습니다. 지금은 83명입니다. 학생은 159명에서 57명으로, 청년은 202명에서 65명으로 줄었습니다. 어린이·학생·청년을 합치면 18년간 709명에서 205명으로, <strong>505명이 사라진 것</strong>입니다.</p>
+      <p>더 심각한 것은 39개 교당 중 18개에서 청소년이 한 명도 법회에 나오지 않는다는 것입니다. 어린이법회를 운영하는 교당도 90년 26개에서 108년 19개로 줄었고, 교당당 평균 출석도 3분의 1이 됐습니다.</p>
+    </div>
+  </div>
+  <hr class="sum-div">
+  <div class="sum-sec">
+    <div class="sum-title">2. 왜 이렇게 됐는가</div>
+    <div class="sum-box"><div class="sum-box-label">한 줄 결론</div><div class="sum-box-text">저출산·사교육은 막을 수 없는 외부 원인입니다. 그러나 같은 조건에서도 동영교당(23%)과 나운교당(0%)이 다른 것은 내부 요인이 있다는 뜻입니다.</div></div>
+    <div class="sum-body">
+      <p>한국의 합계출산율은 0.72로 세계 최저입니다. 주말 사교육이 가득 찼고, 20대 중 65%가 종교가 없습니다. 이것은 원불교만의 문제가 아닙니다.</p>
+      <p>그런데 같은 지역에서도 교당마다 차이가 납니다. 어린이·청년 법회를 별도 시간대에 운영하느냐, 신시가지에 있느냐, 어떤 교무님이 계시느냐가 다릅니다. 데이터 분석 결과, <strong>청소년 담당 교무님이 35~44세인 교당에서 청소년 비중이 11.1%</strong>로 가장 높았습니다. 청소년보다 10~15살 위의 형·삼촌 같은 관계가 효과적이라는 것이 수치로도 확인됩니다.</p>
+    </div>
+  </div>
+  <hr class="sum-div">
+  <div class="sum-sec">
+    <div class="sum-title">3. 심층 분석에서 새롭게 발견한 것들</div>
+    <div class="sum-box"><div class="sum-box-label">한 줄 결론</div><div class="sum-box-text">군종교당 입교자는 10년 후 82%가 이탈합니다. 전역 전 지역 교당 연결이 없는 것이 핵심 원인입니다.</div></div>
+    <div class="sum-body">
+      <p><strong>군종교당 입교자 38,183명의 행방:</strong> 입교 직후에는 98.5%가 관리교도입니다. 그런데 10~14년 후에는 17.8%만 남고, 15년 후에는 0.3%로 사실상 소멸합니다. 취업·결혼·이사로 교당과의 연결이 끊어지는 것이 원인입니다. <strong>전역 전 지역 교당 연결 프로그램</strong> 하나로 이 상황을 크게 바꿀 수 있습니다.</p>
+      <p><strong>어린이 입교의 효과:</strong> 데이터상 어린이 입교자의 잔류율(16.2%)이 성인 입교(20.8%)보다 낮습니다. 하지만 이것은 행정적 관리 여부만의 수치이고, "어린이 때 교당을 경험했다는 기억 자체"의 가치는 측정되지 않습니다.</p>
+      <p><strong>관리교도 고령화:</strong> 60세 이상(36.1%)이 40세 미만(32.8%)을 이미 넘어섰습니다. 지금의 50~60대가 자연 감소하면 그것이 다음 출석 급감의 원인이 됩니다.</p>
+    </div>
+  </div>
+  <hr class="sum-div">
+  <div class="sum-sec">
+    <div class="sum-title">4. 무엇을 해야 하는가</div>
+    <div class="sum-box"><div class="sum-box-label">한 줄 결론</div><div class="sum-box-text">39개 교당에 고루 나누지 말고, 잘 되는 4~5개 교당에 집중하고, 군종교당 전역자 연계 체계를 만드는 것이 핵심입니다.</div></div>
+    <div class="sum-body">
+      <p><span class="ep3">즉시</span> 동영·영등·어양·북일 4개 교당에 청년·어린이 법회 별도 운영 및 교무님 집중 배치. 지금처럼 39개에 고루 나누면 어느 곳에서도 성과가 나지 않습니다.</p>
+      <p><span class="ep1">1~2년</span> 군종교당 전역자 지역 교당 연결 체계 구축. 충용교당 입교 교도가 전역 전 중앙교구 교당에 연결되도록. 38,183명이 이미 원불교와 인연이 있는 분들입니다.</p>
+      <div class="sum-hl"><strong>가장 중요한 한 가지:</strong> 지금 어린이가 없으면 10년 후 청년도 없습니다. 어린이법회를 운영하는 19개 교당, 특히 북일(10.2명/회)·남중(9.9명/회)·동영(8.9명/회) 3개 교당에 집중하는 것이 10년 후 청년 교화의 씨앗입니다.</div>
+    </div>
+  </div>
+  <div class="sum-close">
+    <p><strong>마지막으로</strong></p>
+    <p>이 분석은 수치로 드러나는 현황을 정리한 것입니다. 교당마다의 역사, 지역 교도분들과의 인연, 교무님 한 분 한 분의 헌신은 수치로 다 담기지 않습니다. 다만 방향을 잡는 데 작은 도움이 되기를 바랍니다.</p>
+    <p style="color:#73726c;font-size:12px;margin-top:8px;">원기 90~108년 교정통계 기반 · 중앙교구 기획</p>
+  </div>
+</div>
+</div>
+
+
+<!-- ⑥ 외부 시선 -->
+<div class="tp" id="t7">
+  <div class="shd"><span class="snum">외부</span><div><div class="sttl">비슷한 상황의 다른 조직들은 무엇을 문제로 보고 어떻게 대응하는가</div><div class="ssub">한국 주요 종교 · 일본 종교·지역 조직 · 비종교 분야 사례 · 원불교 중앙교구에 주는 시사점</div></div></div>
+
+  <div class="note n-g"><strong>왜 외부를 보는가:</strong> 청소년·청년 이탈, 고령화, 농촌 인구 소멸이라는 문제는 원불교만의 것이 아닙니다. 한국·일본의 다른 종교와 조직들이 같은 문제를 먼저 겪었고, 일부는 유의미한 성과를 내고 있습니다. 이들의 문제 인식과 대응 방식에서 중앙교구가 참고할 것과 피해야 할 것을 추려냈습니다.</div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;">한국 개신교 — 가장 먼저, 가장 크게 겪고 있습니다</h3>
+    <div class="g2">
+      <div>
+        <div class="find-card fc-r" style="margin:0;">
+          <div class="fc-title" style="color:#a32d2d;">문제 인식</div>
+          <div class="fc-body">
+            <strong>20대 기독교인 비율 9%</strong>(2023년 한국갤럽). 2017년 대비 절반 수준으로 급감했습니다. 2024년 기준 전국 교회 청년 출석이 통계 집계 이후 최저치를 기록했습니다.<br><br>
+            특히 주목할 것은 <strong>"이탈 청년의 63%가 청년부가 아닌 장년 예배에 숨어 있다"</strong>는 발견입니다(목회데이터연구소 2025년 조사). 이미 이탈 중인데 숫자에는 잡히지 않는 구조입니다.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="find-card fc-b" style="margin:0;">
+          <div class="fc-title" style="color:#185fa5;">대응 방식</div>
+          <div class="fc-body">
+            ① <strong>이탈 골든타임 2년 이론</strong>: 청년이 장년 예배로 이동한 후 2년이 이탈 방지 결정 기간. 이 기간에 개입하지 않으면 대부분 이탈.<br>
+            ② <strong>SNS·온라인 소그룹</strong>: "교회로 오라"보다 SNS 콘텐츠, 온라인 소그룹으로 신앙 공동체와 자연스럽게 재연결.<br>
+            ③ <strong>부모 신앙의 중요성 재발견</strong>: 이탈 청년의 가족 내 기독교인 비율이 유지 청년보다 낮음. 40~50대 부모 신앙이 청년 이탈 억제의 마지막 보루.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note n-a" style="margin-top:8px;">
+      <strong>중앙교구 시사점:</strong> <span style="color:#185fa5;font-weight:600;">청소년 법회에 나오지 않아도 교당에 등록된 20대가 얼마나 있는지 파악이 필요합니다.</span> 중앙교구의 20대 관리교도 1,244명 중 일반 법회에만 나오는 분들의 수를 확인하면, 개신교처럼 "숨어있는 이탈 예비자"를 조기에 파악할 수 있습니다. 이탈 골든타임 논리는 원불교에도 동일하게 적용됩니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;">한국 불교 (조계종) — 가장 창의적인 대응을 보이고 있습니다</h3>
+    <div class="g2">
+      <div>
+        <div class="find-card fc-a" style="margin:0;">
+          <div class="fc-title" style="color:#854f0b;">문제 인식</div>
+          <div class="fc-body">
+            법회 참석률이 10~13%로 전 종교 중 가장 낮습니다. 20대의 종교 없음 비율이 70%에 달합니다. <strong>"어렵고 고리타분하다"는 불교 이미지</strong>가 가장 큰 장벽으로 지목됐습니다.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="find-card fc-t" style="margin:0;">
+          <div class="fc-title" style="color:#3b6d11;">대응 방식 — 성과 있음</div>
+          <div class="fc-body">
+            <strong>뉴진스님(2023~2024)</strong>: 개그맨 윤성호가 DJ 스님 역할로 EDM 공연. 불교박람회 20~30대 방문객 <strong>전년 대비 3배 증가</strong>. 조계종이 공식 지지.<br><br>
+            <strong>'나는 절로' 사찰 소개팅</strong>: 20~30대 대상 사찰 체험 소개팅 프로그램. 종교 목적 없이 참여 가능. 큰 인기 끌며 새로운 붐 형성.<br><br>
+            <strong>선명상 대중화</strong>: 종교색 없는 명상 앱·유튜브. 예일대 특강까지 진출.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note n-t" style="margin-top:8px;">
+      <strong>중앙교구 시사점:</strong> <span style="color:#3b6d11;font-weight:600;">불교의 성공은 "종교 입문"이 아닌 "문화·체험으로 먼저 접촉"에 있습니다.</span> 원불교도 '마음공부'라는 보편적 가치가 있습니다. "원불교 법회에 오세요"가 아닌 "마음공부 클래스에서 만나요"로 접근하는 것이 같은 논리입니다. 뉴진스님 사례는 경직된 전통 이미지를 깨는 것이 얼마나 큰 효과를 내는지 보여줍니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;">한국 천주교 — 소공동체와 청년성서모임으로 대응하고 있습니다</h3>
+    <div class="g2">
+      <div>
+        <div class="find-card fc-r" style="margin:0;">
+          <div class="fc-title" style="color:#a32d2d;">문제 인식</div>
+          <div class="fc-body">
+            사제 성소자(신학생)가 2010년 1,674명에서 2024년 899명으로 <strong>46% 감소</strong>. 청년 인구 감소폭(9%)의 5배입니다. 사제 부족으로 농촌 본당 유지 자체가 어려워지고 있습니다.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="find-card fc-b" style="margin:0;">
+          <div class="fc-title" style="color:#185fa5;">대응 방식</div>
+          <div class="fc-body">
+            <strong>소공동체 운동</strong>: 10~15명이 자체적으로 모이는 소모임 체계. 사제가 없어도 신자들이 자율적으로 신앙생활 유지. 전국 확산.<br><br>
+            <strong>청년성서모임</strong>: 1972년 시작, 매년 5,000명 참가. 20~39세 대상 성경공부 모임. 평신도 봉사자가 직접 운영. 사제 의존도 낮춤.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note n-b" style="margin-top:8px;">
+      <strong>중앙교구 시사점:</strong> <span style="color:#185fa5;font-weight:600;">교무님 한 분이 모든 것을 이끌어야 한다는 구조를 바꿀 필요가 있습니다.</span> 천주교는 사제 없이도 소공동체가 돌아가는 체계를 50년 넘게 발전시켰습니다. 원불교 교화단이 이와 유사한 역할을 할 수 있지만, 아직 교무님 중심 구조가 강합니다. 교화단원이 청년·어린이 소모임을 자율적으로 이끌 수 있도록 역할 이양이 필요합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:12px;">일본 종교·지역 조직 — 한국보다 10년 앞서 겪고 있습니다</h3>
+    <div class="note n-r"><strong>일본은 이미 다음 단계에 있습니다.</strong> 일본불교는 후계자 없는 사찰이 전국적으로 발생하고 있고, 일부 농촌 지역은 종교 공동체 자체가 소멸했습니다. 한국이 10~15년 후 마주할 현실을 먼저 겪고 있습니다.</div>
+    <div class="g2">
+      <div>
+        <div class="find-card fc-r" style="margin:0;">
+          <div class="fc-title" style="color:#a32d2d;">일본의 문제 인식</div>
+          <div class="fc-body">
+            <strong>후계자 없는 사찰</strong>: 일본 불교 사찰 약 7만 7천 곳 중 상당수가 주지 스님 고령화 및 후계자 부재 상태. "무 주지 사찰" 증가.<br>
+            <strong>한계마을 종교 소멸</strong>: 인구 소멸 마을에서 종교 공동체가 먼저 사라지는 현상 확인. 2014년 마스다 레포트가 "지방소멸" 경고 → 원불교 농촌 교당과 동일한 궤적.
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="find-card fc-a" style="margin:0;">
+          <div class="fc-title" style="color:#854f0b;">일본의 대응 방식</div>
+          <div class="fc-body">
+            <strong>사찰 합사(合祀) 전략</strong>: 주지 없는 사찰을 인근 사찰이 흡수·통합. 교도(신도)는 합사 후에도 원래 사찰 묘지·법회 유지.<br>
+            <strong>지역 거점 사찰화</strong>: 복지·문화 기능을 통합해 사찰을 지역 커뮤니티 허브로 전환. 단순 종교 공간에서 생활 거점으로.<br>
+            <strong>디지털 법회</strong>: 이동이 어려운 농촌 고령 신도 대상 온라인 법회 정착.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note n-a" style="margin-top:8px;">
+      <strong>중앙교구 시사점:</strong> <span style="color:#854f0b;font-weight:600;">일본의 "합사 전략"은 Step 4의 통합 대상 교당 처리 방식과 동일한 논리입니다.</span> 중요한 것은 일본 사례에서 "물리적 사찰(교당)을 없애도 신도(교도)와의 관계는 유지한다"는 점입니다. 통합 시 교도분들의 소속감과 역사적 인연을 어떻게 보존할지가 핵심입니다. 또 농촌 교당을 지역 커뮤니티 허브로 전환하는 방향도 참고할 만합니다.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px;">비종교 분야 — 같은 문제를 먼저 겪은 조직들</h3>
+    <table class="tbl">
+      <tr><th>조직 유형</th><th>문제</th><th>대응</th><th>원불교 적용점</th></tr>
+      <tr>
+        <td style="font-weight:600;">한국 노동조합</td>
+        <td style="text-align:left;font-size:12px;">조합원 고령화, 20~30대 가입률 저하. "청년에게 노조가 뭔 상관이냐" 인식.</td>
+        <td style="text-align:left;font-size:12px;">청년 조합원 전용 소통 채널, 청년위원회 설치. 청년 의제(주거·고용) 중심으로 재편.</td>
+        <td style="text-align:left;font-size:12px;"><strong>청년이 관심있는 의제</strong>(취업·결혼·정신건강)를 교화 접점으로 활용. 법회 형식보다 청년 삶의 고민을 다루는 내용이 먼저.</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;">지역 농협·마을회</td>
+        <td style="text-align:left;font-size:12px;">회원 평균 연령 70대 초과. 후계자 없어 조직 소멸 위기.</td>
+        <td style="text-align:left;font-size:12px;">청년농부 귀농 유치 + 협력. 기존 어른과 청년의 역할 분담 체계 설계.</td>
+        <td style="text-align:left;font-size:12px;"><strong>기성 교도와 신규 청년의 역할 분담</strong>. 기성 교도는 인맥·자원·경험, 청년은 에너지·아이디어·기술. 수직이 아닌 협력 관계.</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;">한국 공연·문화 기관</td>
+        <td style="text-align:left;font-size:12px;">전통예술·클래식 관객 고령화. 새 관객 유입 없음.</td>
+        <td style="text-align:left;font-size:12px;">짧은 공연, 설명 있는 입문 프로그램. "처음 오는 분" 특화 이벤트. 온라인 무료 공개.</td>
+        <td style="text-align:left;font-size:12px;"><strong>법회 입문 장벽 낮추기</strong>. 30분 짧은 법회, 설명 있는 안내 프로그램, 처음 오는 분 환영 문화. 기존 형식을 고집하지 않는 것.</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3 style="margin-bottom:10px;">외부 사례에서 뽑은 핵심 인사이트 5가지 — 원불교 중앙교구에 주는 메시지</h3>
+    <table class="tbl">
+      <tr><th>#</th><th>인사이트</th><th>근거</th><th>중앙교구 적용</th></tr>
+      <tr>
+        <td style="font-weight:600;color:#185fa5;">①</td>
+        <td style="font-weight:600;">숨어있는 이탈자를 먼저 찾으라</td>
+        <td style="text-align:left;font-size:12px;">개신교: 이탈 청년 63%가 장년 예배에 숨어있음. 이탈 골든타임 2년.</td>
+        <td style="text-align:left;font-size:12px;">20대 관리교도 1,244명 중 청년법회가 아닌 일반 법회에 나오는 분 파악 → 맞춤 관리 시작.</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:#3b6d11;">②</td>
+        <td style="font-weight:600;">진입 장벽을 없애야 새 인연이 온다</td>
+        <td style="text-align:left;font-size:12px;">불교 '나는 절로'·'뉴진스님': 종교색 없이 문화·체험으로 먼저 접촉. 방문객 3배 증가.</td>
+        <td style="text-align:left;font-size:12px;">마음공부 오픈 클래스, 어양교당 체험 프로그램. "원불교"가 아닌 "마음공부"로 접근.</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:#3b6d11;">③</td>
+        <td style="font-weight:600;">교무님 없이도 돌아가는 구조를 만들어라</td>
+        <td style="text-align:left;font-size:12px;">천주교 소공동체: 50년간 사제 없이 신자 자율 운영. 청년성서모임: 평신도 주도.</td>
+        <td style="text-align:left;font-size:12px;">교화단원이 청년·어린이 소모임 자율 운영. 교무님은 코치 역할. 지금의 교무님 중심 구조 완화.</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:#854f0b;">④</td>
+        <td style="font-weight:600;">통합해도 인연은 지켜야 한다</td>
+        <td style="text-align:left;font-size:12px;">일본 합사 전략: 물리적 사찰은 없애도 신도 관계는 유지. 묘지·법회 형식 보존.</td>
+        <td style="text-align:left;font-size:12px;">통합 대상 5개 교당 처리 시, 교도분들이 소속감을 잃지 않도록 역사·명패 보존, 정기 방문 서비스.</td>
+      </tr>
+      <tr>
+        <td style="font-weight:600;color:#a32d2d;">⑤</td>
+        <td style="font-weight:600;">부모 세대 신앙이 청소년의 마지막 연결고리다</td>
+        <td style="text-align:left;font-size:12px;">개신교 조사: 이탈 억제 청년의 공통점은 가족(특히 어머니)이 기독교인. 부모 신앙이 방파제 역할.</td>
+        <td style="text-align:left;font-size:12px;">40~50대 교도의 신앙 활성화가 자녀 세대 연결의 열쇠. 가족 단위 법회, 자녀 동반 참여 프로그램.</td>
+      </tr>
+    </table>
+    <div class="fn"><span>· 출처: 목회데이터연구소 '교회 이탈 청년 조사'(2025.7) / 현대불교신문 '2024년 10대 뉴스'(2024.12) / 서울신문 '뉴진스님 조계종 방문'(2024.4) / 천주교서울대교구 청년성서모임 / 한국천주교주교회의 사제인명록(2024) / 다이버스아시아 '일본 지방소멸론'</span></div>
+  </div>
+
+  <div class="note n-g" style="margin-top:8px;">
+    <strong>한 가지 중요한 경고:</strong> 외부 사례를 그대로 이식하는 것은 위험합니다. 불교의 '뉴진스님' 방식이 원불교에 맞는지, 천주교의 소공동체 구조가 교화단 체계와 다른지 신중하게 따져봐야 합니다. 참고는 하되, 원불교의 교리·전통·교도 문화 위에서 재해석하는 것이 중요합니다.
+  </div>
+</div>
+
+</div>
+<script>
+const TABS=['t1','t2','t3','t4','t5','t6','t7'];
+function sw(id,btnId){
+  TABS.forEach(t=>{const e=document.getElementById(t);if(e)e.classList.remove('on');});
+  document.querySelectorAll('#tabs .tab').forEach(b=>b.classList.remove('on'));
+  const el=document.getElementById(id);if(el)el.classList.add('on');
+  const btn=document.getElementById(btnId);if(btn)btn.classList.add('on');
+}
+</script>
+</body>
+</html>
