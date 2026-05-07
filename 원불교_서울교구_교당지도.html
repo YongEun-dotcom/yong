@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>원불교 서울교구 교당 분포 지도</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  if (typeof L === 'undefined') {
+    document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"><\/script>');
+  }
+</script>
+
+<style>
+  :root {
+    --bg: #FAFAF6; --panel: #FFFFFF;
+    --ink: #1A1B1F; --ink-soft: #4A4D55; --ink-mute: #8B8E96;
+    --line: #E4E2DA; --line-soft: #EFEDE5;
+    --accent: #6B2D2D; --accent-soft: #F4E8E5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Pretendard', 'Malgun Gothic', system-ui, sans-serif;
+    font-size: 16px; color: var(--ink); background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  .app { display: flex; height: 100vh; width: 100vw; }
+  .sidebar {
+    width: 380px; flex-shrink: 0; background: var(--panel);
+    border-right: 1px solid var(--line); display: flex;
+    flex-direction: column; overflow: hidden;
+  }
+  .header { padding: 22px 24px 18px; border-bottom: 1px solid var(--line); }
+  .header .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 22px; font-weight: 800; line-height: 1.25;
+    letter-spacing: -0.02em; margin-bottom: 6px;
+  }
+  .header .sub { font-size: 13px; color: var(--ink-mute); line-height: 1.5; }
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 1px; background: var(--line); border-bottom: 1px solid var(--line);
+  }
+  .stat { background: var(--panel); padding: 12px 8px; text-align: center; }
+  .stat .num {
+    font-size: 22px; font-weight: 800; color: var(--ink);
+    letter-spacing: -0.02em; font-feature-settings: "tnum";
+  }
+  .stat .lbl { font-size: 11px; color: var(--ink-mute); margin-top: 3px; font-weight: 500; }
+  .controls {
+    padding: 14px 18px 12px; border-bottom: 1px solid var(--line); background: #FCFBF7;
+  }
+  .search-box {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--line);
+    border-radius: 6px; font-size: 14px; font-family: inherit;
+    background: white; margin-bottom: 10px;
+  }
+  .search-box:focus { outline: none; border-color: var(--accent); }
+  .filter-title-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 6px 0 8px;
+  }
+  .filter-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--ink-mute); text-transform: uppercase;
+  }
+  .toggle-all {
+    font-size: 11px; font-weight: 700; color: var(--accent);
+    background: none; border: none; cursor: pointer; padding: 2px 8px;
+    border-radius: 4px; font-family: inherit;
+    transition: background 0.15s;
+  }
+  .toggle-all:hover { background: var(--accent-soft); }
+  .filter-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip {
+    padding: 5px 10px; border: 1px solid var(--line); background: white;
+    border-radius: 999px; font-size: 12px; font-weight: 600;
+    color: var(--ink-soft); cursor: pointer; user-select: none;
+    transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .chip:hover { background: var(--line-soft); }
+  .chip.active { background: var(--ink); color: white; border-color: var(--ink); }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .chip.active .dot { background: white; }
+  .chip.inst-chip { border-style: dashed; }
+  .chip.inst-chip .dot { width: 8px; height: 8px; border-radius: 1px; transform: rotate(45deg); }
+  .list-wrap { flex: 1; overflow-y: auto; padding: 4px 0; }
+  .list-section {
+    padding: 10px 18px 7px; font-size: 11.5px; font-weight: 700;
+    letter-spacing: 0.1em; color: var(--ink-mute); text-transform: uppercase;
+    background: var(--bg); border-bottom: 1px solid var(--line-soft);
+    position: sticky; top: 0; z-index: 1;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .list-section .sec-name { display: flex; align-items: center; gap: 7px; }
+  .list-section .sec-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .list-section .sec-cnt {
+    font-size: 11px; font-weight: 700; color: var(--ink-mute);
+    background: white; padding: 2px 8px; border-radius: 10px;
+    border: 1px solid var(--line); font-feature-settings: "tnum";
+  }
+  .list-section.divider {
+    background: linear-gradient(to right, transparent, #E0DCD0, transparent);
+    color: var(--ink-soft); padding: 14px 18px 10px; margin-top: 4px;
+    border-bottom: 2px solid var(--line);
+  }
+  .list-section.divider .sec-cnt { background: var(--ink); color: white; border-color: var(--ink); }
+  .item {
+    padding: 11px 18px; border-bottom: 1px solid var(--line-soft);
+    cursor: pointer; display: flex; align-items: flex-start; gap: 10px;
+    transition: background 0.1s;
+  }
+  .item:hover { background: var(--line-soft); }
+  .item.active { background: var(--accent-soft); }
+  .item .marker { width: 11px; height: 11px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .item.inst .marker { border-radius: 1px; transform: rotate(45deg); }
+  .item .body { flex: 1; min-width: 0; }
+  .item .name { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 2px; letter-spacing: -0.01em; }
+  .item .meta { font-size: 11.5px; color: var(--ink-mute); line-height: 1.45; }
+  .item .meta b { color: var(--ink-soft); font-weight: 600; }
+  .item .tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px; background: var(--line-soft);
+    color: var(--ink-soft); letter-spacing: 0.04em; margin-right: 4px;
+  }
+  .item .grade-tag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 1px 6px; border-radius: 3px;
+    background: #F0E5D5; color: #6B5635; margin-right: 4px;
+  }
+
+  .map-wrap { flex: 1; position: relative; }
+  #map { height: 100%; width: 100%; background: #E8E5DA; }
+  .toolbar {
+    position: absolute; top: 12px; right: 12px; z-index: 1000;
+    background: white; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border: 1px solid var(--line); padding: 6px; display: flex; gap: 4px;
+  }
+  .tool-btn {
+    padding: 7px 12px; border: none; background: white;
+    color: var(--ink-soft); font-size: 12.5px; font-weight: 600;
+    cursor: pointer; border-radius: 5px; font-family: inherit;
+  }
+  .tool-btn:hover { background: var(--line-soft); }
+  .tool-btn.active { background: var(--ink); color: white; }
+
+  .gd-marker {
+    border-radius: 50%; border: 2.5px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.08);
+    cursor: pointer; transition: transform 0.15s ease;
+  }
+  .gd-marker:hover { transform: scale(1.15); }
+  .gd-marker.inst { border-radius: 3px; transform: rotate(45deg); }
+  .gd-marker.inst:hover { transform: rotate(45deg) scale(1.15); }
+  .gd-marker.pending { opacity: 0.55; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+
+  .leaflet-tooltip.gd-label {
+    background: white !important; border: none !important;
+    border-radius: 6px !important; padding: 0 !important;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08) !important;
+    font-family: inherit !important; white-space: nowrap !important;
+    margin-left: 8px !important;
+  }
+  .leaflet-tooltip.gd-label::before { display: none !important; }
+  .gd-label-inner { display: flex; align-items: stretch; overflow: hidden; }
+  .gd-label-bar { width: 4px; flex-shrink: 0; }
+  .gd-label-text {
+    padding: 4px 9px 4px 8px;
+    font-size: 12px; font-weight: 700;
+    color: #1A1B1F; line-height: 1.3;
+  }
+  .gd-label-text .lbl-name { font-weight: 700; color: #1A1B1F; }
+  .gd-label-text .lbl-gu { font-size: 10px; opacity: 0.7; font-weight: 500; margin-top: 1px; }
+
+  .leaflet-popup-content-wrapper {
+    border-radius: 10px !important; padding: 0 !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06) !important;
+  }
+  .leaflet-popup-content { margin: 0 !important; font-family: inherit; }
+  .popup { padding: 0; min-width: 270px; max-width: 320px; }
+  .popup .phead { padding: 12px 16px 10px; border-bottom: 1px solid var(--line-soft); }
+  .popup .pgu {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 5px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .popup .pgu-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .popup .ptag {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 3px; background: var(--line-soft);
+    color: var(--ink-soft); margin-left: 6px;
+  }
+  .popup .pname {
+    font-size: 17px; font-weight: 800; letter-spacing: -0.01em;
+    margin-bottom: 6px; color: var(--ink);
+  }
+  .popup .pgrade {
+    display: inline-block; font-size: 11px; font-weight: 700;
+    padding: 3px 10px; border-radius: 4px;
+    background: #F0E5D5; color: #6B5635; letter-spacing: 0.04em;
+  }
+  .popup .pstat {
+    display: flex; gap: 0;
+    background: #FBFAF5; border-bottom: 1px solid var(--line-soft);
+  }
+  .popup .pstat-item {
+    flex: 1; padding: 10px 8px; text-align: center;
+    border-right: 1px solid var(--line-soft);
+  }
+  .popup .pstat-item:last-child { border-right: none; }
+  .popup .pstat-item .v {
+    font-size: 17px; font-weight: 800; font-feature-settings: "tnum";
+    color: var(--ink);
+  }
+  .popup .pstat-item .l {
+    font-size: 10px; color: var(--ink-mute);
+    letter-spacing: 0.04em; margin-top: 2px;
+  }
+  .popup .paddr {
+    padding: 10px 16px;
+    font-size: 12px; color: var(--ink-soft); line-height: 1.5;
+  }
+  .popup .pnostat {
+    padding: 10px 16px;
+    font-size: 11.5px; color: var(--ink-mute);
+    background: #FBFAF5; border-bottom: 1px solid var(--line-soft);
+  }
+
+  /* === 좌표 정확화 패널 (간소화) === */
+  .geo-toast {
+    position: absolute; bottom: 16px; left: 16px; z-index: 1000;
+    background: white; border: 1px solid var(--line); border-radius: 10px;
+    padding: 12px 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: 300px; transition: opacity 0.5s, transform 0.4s;
+  }
+  .geo-toast.hidden { opacity: 0; pointer-events: none; transform: translateY(20px); }
+  .gt-title {
+    font-size: 13px; font-weight: 700; color: var(--ink);
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 6px;
+  }
+  .gt-status { font-size: 11.5px; color: var(--ink-soft); margin-bottom: 8px; }
+  .gt-bar {
+    height: 5px; background: #EEE; border-radius: 3px; overflow: hidden;
+  }
+  .gt-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #6B2D2D, #C7884C);
+    transition: width 0.3s;
+  }
+  .gt-text {
+    font-size: 11px; color: var(--ink-mute); font-feature-settings: "tnum";
+    margin-top: 4px; display: flex; justify-content: space-between;
+  }
+  .gt-close {
+    width: 22px; height: 22px; cursor: pointer; color: var(--ink-mute);
+    line-height: 1; font-size: 18px; font-weight: 700;
+    background: none; border: none; padding: 0;
+  }
+  .gt-reset-link {
+    margin-top: 6px; font-size: 10.5px; color: var(--ink-mute);
+    text-align: right;
+  }
+  .gt-reset-link button {
+    background: none; border: none; color: var(--accent);
+    cursor: pointer; font-family: inherit; padding: 0;
+    text-decoration: underline; font-size: 10.5px;
+  }
+
+  @media (max-width: 768px) {
+    .app { flex-direction: column; }
+    .sidebar { width: 100%; height: 45%; border-right: none; border-bottom: 1px solid var(--line); }
+    .map-wrap { height: 55%; }
+    .geo-toast { width: calc(100% - 32px); }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="header">
+      <div class="eyebrow">원불교 · 서울교구 · 원기 108년</div>
+      <h1>서울교구 교당<br>분포 지도</h1>
+      <div class="sub">6개 일반 지구 + 특수목적 + 기관·부속 — 전체 74개소</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">74</div><div class="lbl">전체</div></div>
+      <div class="stat"><div class="num">59</div><div class="lbl">서울</div></div>
+      <div class="stat"><div class="num">14</div><div class="lbl">경기</div></div>
+      <div class="stat"><div class="num">1</div><div class="lbl">인천</div></div>
+    </div>
+    <div class="controls">
+      <input type="text" class="search-box" id="search" placeholder="🔍 교당명·주소 검색...">
+      <div class="filter-title-row">
+        <span class="filter-title">분류 필터</span>
+        <button class="toggle-all" id="toggleAll">전체 해제</button>
+      </div>
+      <div class="filter-chips" id="filterChips"></div>
+    </div>
+    <div class="list-wrap" id="listWrap"></div>
+  </aside>
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="toolbar">
+      <button class="tool-btn active" data-tile="voyager">기본</button>
+      <button class="tool-btn" data-tile="osm">OSM</button>
+      <button class="tool-btn" data-tile="positron">단색</button>
+      <button class="tool-btn" data-tile="satellite">위성</button>
+    </div>
+
+    <!-- 좌표 정확화 진행 토스트 (자동) -->
+    <div class="geo-toast hidden" id="geoToast">
+      <div class="gt-title">
+        <span id="gtTitle">📍 좌표 정확화 중</span>
+        <button class="gt-close" id="gtClose" title="닫기">×</button>
+      </div>
+      <div class="gt-status" id="gtStatus">카카오 지도로 정확한 위치를 가져오는 중...</div>
+      <div class="gt-bar"><div class="gt-bar-fill" id="gtBarFill" style="width:0%"></div></div>
+      <div class="gt-text">
+        <span id="gtText">0 / 0</span>
+        <span id="gtEta"></span>
+      </div>
+      <div class="gt-reset-link">
+        <button id="gtReset">캐시 초기화 후 다시 변환</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+if (typeof L === 'undefined') {
+  document.body.innerHTML = '<div style="padding:60px;text-align:center"><h2>⚠️ Leaflet 로드 실패</h2></div>';
+  throw new Error('Leaflet not loaded');
+}
+
+const KAKAO_REST_KEY = "664a0b1454ec04cb3f7a6bd0f696dca4";
+
+const DATA = [{"코드":308010,"이름":"가락교당","지구":"강남지구","기관유형":"","주소":"서울특별시 송파구 송파대로34가길 12","광역":"서울","시군구":"송파구","자치구":"","관리":486,"출석":4833,"교무":2,"입교":7,"lat":37.4922,"lng":127.1184,"급지":"특급지","동":"가락동","평균출석":91.3,"출석횟수":46,"일반출석합":4202,"통계없음":false,"fallbackLat":37.4922,"fallbackLng":127.1184},{"코드":308020,"이름":"강남교당","지구":"강남지구","기관유형":"","주소":"서울특별시 강남구 자곡로 204-19 (자곡동)","광역":"서울","시군구":"강남구","자치구":"","관리":1473,"출석":21541,"교무":5,"입교":33,"lat":37.4783,"lng":127.1006,"급지":"특급지","동":"자곡동","평균출석":347.4,"출석횟수":51,"일반출석합":17717,"통계없음":false,"fallbackLat":37.4783,"fallbackLng":127.1006},{"코드":308030,"이름":"강동교당","지구":"강남지구","기관유형":"","주소":"서울특별시 강동구 명일로 269 (길동)","광역":"서울","시군구":"강동구","자치구":"","관리":206,"출석":6750,"교무":2,"입교":1,"lat":37.5364,"lng":127.1409,"급지":"1급지","동":"길동","평균출석":101.5,"출석횟수":49,"일반출석합":4974,"통계없음":false,"fallbackLat":37.5364,"fallbackLng":127.1409},{"코드":308050,"이름":"강화교당","지구":"화곡지구","기관유형":"","주소":"인천광역시 강화군강화읍 관청길10번길 14","광역":"인천","시군구":"강화군","자치구":"","관리":102,"출석":1607,"교무":1,"입교":4,"lat":37.747,"lng":126.4867,"급지":"4급지","동":"강화읍","평균출석":34.2,"출석횟수":46,"일반출석합":1571,"통계없음":false,"fallbackLat":37.747,"fallbackLng":126.4867},{"코드":308060,"이름":"개봉교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 구로구 개봉로16길 15 (개봉동)","광역":"서울","시군구":"구로구","자치구":"","관리":338,"출석":2980,"교무":2,"입교":6,"lat":37.4949,"lng":126.8542,"급지":"1급지","동":"개봉동","평균출석":58.6,"출석횟수":47,"일반출석합":2752,"통계없음":false,"fallbackLat":37.4949,"fallbackLng":126.8542},{"코드":308070,"이름":"개포교당","지구":"강남지구","기관유형":"","주소":"서울특별시 강남구 논현로 10. (개포동)","광역":"서울","시군구":"강남구","자치구":"","관리":111,"출석":758,"교무":1,"입교":0,"lat":37.4855,"lng":127.0658,"급지":"3급지","동":"개포동","평균출석":18.8,"출석횟수":38,"일반출석합":714,"통계없음":false,"fallbackLat":37.4855,"fallbackLng":127.0658},{"코드":308090,"이름":"공항교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 강서구 공항대로7다길 14 (공항동)","광역":"서울","시군구":"강서구","자치구":"","관리":322,"출석":1291,"교무":1,"입교":3,"lat":37.5577,"lng":126.803,"급지":"2급지","동":"공항동","평균출석":27.0,"출석횟수":45,"일반출석합":1214,"통계없음":false,"fallbackLat":37.5577,"fallbackLng":126.803},{"코드":308100,"이름":"구로교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 구로구 가마산로20길 50 (구로동)","광역":"서울","시군구":"구로구","자치구":"","관리":198,"출석":3807,"교무":2,"입교":11,"lat":37.496,"lng":126.8902,"급지":"2급지","동":"구로동","평균출석":64.6,"출석횟수":47,"일반출석합":3035,"통계없음":false,"fallbackLat":37.496,"fallbackLng":126.8902},{"코드":308110,"이름":"구의교당","지구":"원남지구","기관유형":"","주소":"서울특별시 광진구 아차산로63길 35 (구의동)","광역":"서울","시군구":"광진구","자치구":"","관리":150,"출석":1032,"교무":1,"입교":4,"lat":37.5475,"lng":127.0837,"급지":"2급지","동":"구의동","평균출석":25.2,"출석횟수":40,"일반출석합":1008,"통계없음":false,"fallbackLat":37.5475,"fallbackLng":127.0837},{"코드":308300,"이름":"금천교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 금천구 독산로 9 (시흥동)","광역":"서울","시군구":"금천구","자치구":"","관리":107,"출석":693,"교무":1,"입교":2,"lat":37.4525,"lng":126.9053,"급지":"4급지","동":"시흥동","평균출석":14.3,"출석횟수":47,"일반출석합":671,"통계없음":false,"fallbackLat":37.4525,"fallbackLng":126.9053},{"코드":308035,"이름":"김포교당","지구":"화곡지구","기관유형":"","주소":"경기도 김포시 김포대로1129번길 60 (감정동)","광역":"경기","시군구":"김포시","자치구":"","관리":213,"출석":1448,"교무":1,"입교":6,"lat":37.628,"lng":126.7287,"급지":"5급지","동":"감정동","평균출석":28.0,"출석횟수":38,"일반출석합":1063,"통계없음":false,"fallbackLat":37.628,"fallbackLng":126.7287},{"코드":308150,"이름":"도봉교당","지구":"종로지구","기관유형":"","주소":"서울특별시 강북구 도봉로20가길 32 (미아동)","광역":"서울","시군구":"강북구","자치구":"","관리":95,"출석":1238,"교무":1,"입교":4,"lat":37.6275,"lng":127.0241,"급지":"1급지","동":"미아동","평균출석":28.5,"출석횟수":42,"일반출석합":1197,"통계없음":false,"fallbackLat":37.6275,"fallbackLng":127.0241},{"코드":308160,"이름":"돈암교당","지구":"종로지구","기관유형":"","주소":"서울특별시 성북구 동소문로26길 32 (동선동3가)","광역":"서울","시군구":"성북구","자치구":"","관리":363,"출석":3164,"교무":2,"입교":3,"lat":37.5915,"lng":127.0277,"급지":"특급지","동":"동선동3가","평균출석":60.3,"출석횟수":44,"일반출석합":2655,"통계없음":false,"fallbackLat":37.5915,"fallbackLng":127.0277},{"코드":308170,"이름":"동두천교당","지구":"종로지구","기관유형":"","주소":"경기도 동두천시 평화로2930번길 46 (상봉암동)","광역":"경기","시군구":"동두천시","자치구":"","관리":156,"출석":482,"교무":1,"입교":2,"lat":37.9171,"lng":127.0749,"급지":"5급지","동":"상봉암동","평균출석":11.2,"출석횟수":39,"일반출석합":438,"통계없음":false,"fallbackLat":37.9171,"fallbackLng":127.0749},{"코드":308180,"이름":"마포교당","지구":"서울지구","기관유형":"","주소":"서울특별시 마포구 마포대로16길 20 (공덕동)","광역":"서울","시군구":"마포구","자치구":"","관리":158,"출석":2044,"교무":1,"입교":7,"lat":37.5436,"lng":126.9534,"급지":"2급지","동":"공덕동","평균출석":44.1,"출석횟수":44,"일반출석합":1942,"통계없음":false,"fallbackLat":37.5436,"fallbackLng":126.9534},{"코드":308190,"이름":"면목교당","지구":"원남지구","기관유형":"","주소":"서울특별시 중랑구 면목로60길 29 (면목동)","광역":"서울","시군구":"중랑구","자치구":"","관리":90,"출석":611,"교무":1,"입교":1,"lat":37.5878,"lng":127.0892,"급지":"4급지","동":"면목동","평균출석":14.0,"출석횟수":43,"일반출석합":603,"통계없음":false,"fallbackLat":37.5878,"fallbackLng":127.0892},{"코드":308040,"이름":"목동교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 양천구 오목로46길 15 (신정동)","광역":"서울","시군구":"양천구","자치구":"","관리":394,"출석":2439,"교무":2,"입교":10,"lat":37.5145,"lng":126.8634,"급지":"1급지","동":"신정동","평균출석":54.6,"출석횟수":41,"일반출석합":2241,"통계없음":false,"fallbackLat":37.5145,"fallbackLng":126.8634},{"코드":308210,"이름":"방배교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 서초구 동광로1길 8 (방배동)","광역":"서울","시군구":"서초구","자치구":"","관리":79,"출석":1054,"교무":1,"입교":1,"lat":37.4848,"lng":126.993,"급지":"3급지","동":"방배동","평균출석":25.6,"출석횟수":40,"일반출석합":1023,"통계없음":false,"fallbackLat":37.4848,"fallbackLng":126.993},{"코드":308220,"이름":"방학교당","지구":"종로지구","기관유형":"","주소":"서울특별시 도봉구 방학로3길 13 (방학동) 원불교빌딩5층","광역":"서울","시군구":"도봉구","자치구":"","관리":285,"출석":1549,"교무":1,"입교":0,"lat":37.6669,"lng":127.0372,"급지":"3급지","동":"방학동","평균출석":33.1,"출석횟수":45,"일반출석합":1490,"통계없음":false,"fallbackLat":37.6669,"fallbackLng":127.0372},{"코드":308910,"이름":"번동복지관교당","지구":"기관·부속","기관유형":"복지","주소":"서울 강북구 한천로115길 20 (번오마을종합사회복지관)","광역":"서울","시군구":"강북구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.626,"lng":127.0356,"급지":"—","동":"번동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.626,"fallbackLng":127.0356},{"코드":300670,"이름":"봉도수련원교당","지구":"기관·부속","기관유형":"수련·훈련","주소":"서울특별시 강북구 삼양로181길 68-8 (우이동)","광역":"서울","시군구":"강북구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.6618,"lng":127.0096,"급지":"4급지","동":"우이동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.6618,"fallbackLng":127.0096},{"코드":308230,"이름":"불광교당","지구":"서울지구","기관유형":"","주소":"서울특별시 은평구 통일로 911 (갈현동) 4층","광역":"서울","시군구":"은평구","자치구":"","관리":359,"출석":1809,"교무":1,"입교":7,"lat":37.6121,"lng":126.9163,"급지":"2급지","동":"갈현동","평균출석":38.4,"출석횟수":46,"일반출석합":1768,"통계없음":false,"fallbackLat":37.6121,"fallbackLng":126.9163},{"코드":308240,"이름":"사직교당","지구":"종로지구","기관유형":"","주소":"서울특별시 종로구 자하문로13길 11","광역":"서울","시군구":"종로구","자치구":"","관리":94,"출석":807,"교무":1,"입교":3,"lat":37.5751,"lng":126.9712,"급지":"3급지","동":"사직동","평균출석":18.7,"출석횟수":42,"일반출석합":787,"통계없음":false,"fallbackLat":37.5751,"fallbackLng":126.9712},{"코드":308250,"이름":"상계교당","지구":"종로지구","기관유형":"","주소":"서울특별시 노원구 한글비석로23길 27 (상계동)2층","광역":"서울","시군구":"노원구","자치구":"","관리":186,"출석":1416,"교무":1,"입교":5,"lat":37.6557,"lng":127.068,"급지":"2급지","동":"상계동","평균출석":31.2,"출석횟수":44,"일반출석합":1373,"통계없음":false,"fallbackLat":37.6557,"fallbackLng":127.068},{"코드":308260,"이름":"서울교당","지구":"서울지구","기관유형":"","주소":"서울특별시 용산구 한강대로40가길 24, 원불교서울교당 (한강로2가)","광역":"서울","시군구":"용산구","자치구":"","관리":685,"출석":6568,"교무":3,"입교":15,"lat":37.5301,"lng":126.9678,"급지":"특급지","동":"한강로2가","평균출석":119.6,"출석횟수":44,"일반출석합":5262,"통계없음":false,"fallbackLat":37.5301,"fallbackLng":126.9678},{"코드":300420,"이름":"서울보화당교당","지구":"기관·부속","기관유형":"사업·의료","주소":"서울특별시 종로구 종로 237(종로5가)","광역":"서울","시군구":"종로구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.5712,"lng":127.0034,"급지":"특급지","동":"종로5가","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.5712,"fallbackLng":127.0034},{"코드":308425,"이름":"서울이주민교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 강서구 가로공원로84길 59 (화곡동)","광역":"서울","시군구":"강서구","자치구":"","관리":0,"출석":0,"교무":1,"입교":0,"lat":37.5432,"lng":126.8418,"급지":"6급지","동":"화곡동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.5432,"fallbackLng":126.8418},{"코드":308270,"이름":"서초교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 서초구 바우뫼로 43길 31(양재동6-9)","광역":"서울","시군구":"서초구","자치구":"","관리":145,"출석":1119,"교무":1,"입교":3,"lat":37.4837,"lng":127.0395,"급지":"2급지","동":"양재동","평균출석":25.4,"출석횟수":42,"일반출석합":1069,"통계없음":false,"fallbackLat":37.4837,"fallbackLng":127.0395},{"코드":308290,"이름":"송천교당","지구":"종로지구","기관유형":"","주소":"서울특별시 성북구 장위로4길 5 (장위동)","광역":"서울","시군구":"성북구","자치구":"","관리":595,"출석":3379,"교무":2,"입교":5,"lat":37.6121,"lng":127.0479,"급지":"특급지","동":"장위동","평균출석":71.1,"출석횟수":41,"일반출석합":2917,"통계없음":false,"fallbackLat":37.6121,"fallbackLng":127.0479},{"코드":308952,"이름":"시민사회네트워크교당","지구":"특수목적","기관유형":"","주소":"서울특별시 용산구 한강대로40가길 24 (한강로2가)지하 2층","광역":"서울","시군구":"용산구","자치구":"","관리":7,"출석":251,"교무":2,"입교":0,"lat":37.5295,"lng":126.9678,"급지":"6급지","동":"한강로2가","평균출석":7.2,"출석횟수":35,"일반출석합":251,"통계없음":false,"fallbackLat":37.5295,"fallbackLng":126.9678},{"코드":308590,"이름":"시민선방교당","지구":"종로지구","기관유형":"","주소":"서울특별시 종로구 북촌로 5길 29(화동)","광역":"서울","시군구":"종로구","자치구":"","관리":43,"출석":3649,"교무":0,"입교":3,"lat":37.584,"lng":126.9866,"급지":"5급지","동":"화동","평균출석":31.8,"출석횟수":51,"일반출석합":1620,"통계없음":false,"fallbackLat":37.584,"fallbackLng":126.9866},{"코드":308130,"이름":"신길교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 영등포구 신길로15길 1","광역":"서울","시군구":"영등포구","자치구":"","관리":106,"출석":1294,"교무":1,"입교":0,"lat":37.5048,"lng":126.9167,"급지":"2급지","동":"신길동","평균출석":27.6,"출석횟수":44,"일반출석합":1216,"통계없음":false,"fallbackLat":37.5048,"fallbackLng":126.9167},{"코드":308310,"이름":"신림교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 관악구 신림로64길 57 (신림동)","광역":"서울","시군구":"관악구","자치구":"","관리":498,"출석":7442,"교무":3,"입교":7,"lat":37.4836,"lng":126.9295,"급지":"특급지","동":"신림동","평균출석":134.2,"출석횟수":46,"일반출석합":6173,"통계없음":false,"fallbackLat":37.4836,"fallbackLng":126.9295},{"코드":308320,"이름":"신촌교당","지구":"서울지구","기관유형":"","주소":"서울특별시 서대문구 신촌로7길 46 (창천동)","광역":"서울","시군구":"서대문구","자치구":"","관리":302,"출석":2000,"교무":2,"입교":0,"lat":37.5562,"lng":126.9385,"급지":"특급지","동":"창천동","평균출석":30.2,"출석횟수":43,"일반출석합":1297,"통계없음":false,"fallbackLat":37.5562,"fallbackLng":126.9385},{"코드":308330,"이름":"안암교당","지구":"종로지구","기관유형":"","주소":"서울특별시 성북구 안암로 27-7 (안암동4가)","광역":"서울","시군구":"성북구","자치구":"","관리":248,"출석":3937,"교무":2,"입교":1,"lat":37.584,"lng":127.0299,"급지":"1급지","동":"안암동4가","평균출석":48.3,"출석횟수":44,"일반출석합":2125,"통계없음":false,"fallbackLat":37.584,"fallbackLng":127.0299},{"코드":308332,"이름":"양주교당","지구":"종로지구","기관유형":"","주소":"경기도 양주시 평화로1501번길 21-10 (덕계동)","광역":"경기","시군구":"양주시","자치구":"","관리":37,"출석":644,"교무":1,"입교":2,"lat":37.7757,"lng":127.0537,"급지":"6급지","동":"덕계동","평균출석":14.5,"출석횟수":43,"일반출석합":624,"통계없음":false,"fallbackLat":37.7757,"fallbackLng":127.0537},{"코드":308340,"이름":"여의도교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 영등포구 여의 대방로 68길 15 영창빌딩4층","광역":"서울","시군구":"영등포구","자치구":"","관리":780,"출석":7461,"교무":3,"입교":25,"lat":37.5219,"lng":126.9244,"급지":"특급지","동":"여의도동","평균출석":155.8,"출석횟수":45,"일반출석합":7009,"통계없음":false,"fallbackLat":37.5219,"fallbackLng":126.9244},{"코드":308954,"이름":"역삼교당","지구":"강남지구","기관유형":"","주소":"서울특별시 강남구 언주로85길 29 (역삼동)","광역":"서울","시군구":"강남구","자치구":"","관리":964,"출석":5729,"교무":2,"입교":7,"lat":37.5024,"lng":127.04,"급지":"2급지","동":"역삼동","평균출석":114.3,"출석횟수":45,"일반출석합":5145,"통계없음":false,"fallbackLat":37.5024,"fallbackLng":127.04},{"코드":308360,"이름":"연희교당","지구":"서울지구","기관유형":"","주소":"서울특별시 서대문구 홍제천로 6길 21(연희동 652)","광역":"서울","시군구":"서대문구","자치구":"","관리":223,"출석":810,"교무":1,"입교":1,"lat":37.5704,"lng":126.9326,"급지":"4급지","동":"연희동","평균출석":20.8,"출석횟수":37,"일반출석합":769,"통계없음":false,"fallbackLat":37.5704,"fallbackLng":126.9326},{"코드":314020,"이름":"열쇠교당","지구":"특수목적","기관유형":"","주소":"경기도 연천군 청산면 청창로 719 사서함 106-1 제5보병사단","광역":"경기","시군구":"연천군","자치구":"","관리":954,"출석":112,"교무":1,"입교":78,"lat":38.0226,"lng":127.0717,"급지":"6급지","동":"청산면","평균출석":11.0,"출석횟수":10,"일반출석합":112,"통계없음":false,"fallbackLat":38.0226,"fallbackLng":127.0717},{"코드":308380,"이름":"영등포교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 영등포구 영등포로 22길 3-3","광역":"서울","시군구":"영등포구","자치구":"","관리":152,"출석":1013,"교무":1,"입교":3,"lat":37.5188,"lng":126.9079,"급지":"3급지","동":"영등포동","평균출석":19.0,"출석횟수":45,"일반출석합":854,"통계없음":false,"fallbackLat":37.5188,"fallbackLng":126.9079},{"코드":308390,"이름":"예술인의집교당","지구":"기관·부속","기관유형":"문화·예술","주소":"서울특별시 용산구 소월로 375 (한남동)","광역":"서울","시군구":"용산구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.536,"lng":127.0053,"급지":"6급지","동":"한남동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.536,"fallbackLng":127.0053},{"코드":308940,"이름":"오덕훈련원교당","지구":"기관·부속","기관유형":"수련·훈련","주소":"경기도 남양주시 수동면 축령산로 279","광역":"경기","시군구":"남양주시","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.6968,"lng":127.2837,"급지":"5급지","동":"수동면","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.6968,"fallbackLng":127.2837},{"코드":308951,"이름":"우리선문화원선교소","지구":"기관·부속","기관유형":"문화·예술","주소":"서울특별시 종로구 비봉길 68-20데스떼빌리지 A동 201호","광역":"서울","시군구":"종로구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.6028,"lng":126.9608,"급지":"6급지","동":"구기동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.6028,"fallbackLng":126.9608},{"코드":308400,"이름":"원남교당","지구":"원남지구","기관유형":"","주소":"서울특별시 종로구 창경궁로 22길 23","광역":"서울","시군구":"종로구","자치구":"","관리":576,"출석":7630,"교무":3,"입교":10,"lat":37.575,"lng":126.9982,"급지":"특급지","동":"원남동","평균출석":125.3,"출석횟수":46,"일반출석합":5766,"통계없음":false,"fallbackLat":37.575,"fallbackLng":126.9982},{"코드":300664,"이름":"원음방송교당","지구":"기관·부속","기관유형":"방송","주소":"서울특별시 금천구 남부순환로 1350 (독산동)WBS원음방송","광역":"서울","시군구":"금천구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.4737,"lng":126.9011,"급지":"3급지","동":"독산동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.4737,"fallbackLng":126.9011},{"코드":308410,"이름":"원효교당","지구":"서울지구","기관유형":"","주소":"서울특별시 용산구 원효로93길 18-5 (원효로1가)","광역":"서울","시군구":"용산구","자치구":"","관리":87,"출석":689,"교무":1,"입교":2,"lat":37.5371,"lng":126.9665,"급지":"3급지","동":"원효로1가","평균출석":16.8,"출석횟수":41,"일반출석합":689,"통계없음":false,"fallbackLat":37.5371,"fallbackLng":126.9665},{"코드":308420,"이름":"유린교당","지구":"원남지구","기관유형":"","주소":"서울특별시 중랑구 신내로10길 16 (신내동)","광역":"서울","시군구":"중랑구","자치구":"","관리":246,"출석":2156,"교무":2,"입교":5,"lat":37.6087,"lng":127.1054,"급지":"2급지","동":"신내동","평균출석":42.1,"출석횟수":43,"일반출석합":1812,"통계없음":false,"fallbackLat":37.6087,"fallbackLng":127.1054},{"코드":308950,"이름":"은덕문화원교당","지구":"기관·부속","기관유형":"문화·예술","주소":"서울특별시 종로구 창덕궁길 51 (원서동)","광역":"서울","시군구":"종로구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.5793,"lng":126.9876,"급지":"5급지","동":"원서동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.5793,"fallbackLng":126.9876},{"코드":308430,"이름":"은평교당","지구":"서울지구","기관유형":"","주소":"서울특별시 은평구 은평로13길 16-1 (녹번동)","광역":"서울","시군구":"은평구","자치구":"","관리":81,"출석":1189,"교무":1,"입교":5,"lat":37.602,"lng":126.9351,"급지":"3급지","동":"녹번동","평균출석":24.6,"출석횟수":47,"일반출석합":1159,"통계없음":false,"fallbackLat":37.602,"fallbackLng":126.9351},{"코드":308440,"이름":"은혜의집교당","지구":"강남지구","기관유형":"","주소":"서울특별시 동작구 현충로 75 (흑석동)지하1층 원불교교정교화센터 은혜의집","광역":"서울","시군구":"동작구","자치구":"","관리":6,"출석":0,"교무":1,"입교":1,"lat":37.5095,"lng":126.9627,"급지":"6급지","동":"흑석동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.5095,"fallbackLng":126.9627},{"코드":308450,"이름":"의정부교당","지구":"종로지구","기관유형":"","주소":"경기도 의정부시 송산로1161번길 161 (용현동)","광역":"경기","시군구":"의정부시","자치구":"","관리":199,"출석":1505,"교무":1,"입교":24,"lat":37.752,"lng":127.0541,"급지":"4급지","동":"용현동","평균출석":32.7,"출석횟수":45,"일반출석합":1470,"통계없음":false,"fallbackLat":37.752,"fallbackLng":127.0541},{"코드":308460,"이름":"이문교당","지구":"원남지구","기관유형":"","주소":"서울특별시 동대문구 이문로 154 (이문동)","광역":"서울","시군구":"동대문구","자치구":"","관리":379,"출석":2486,"교무":1,"입교":0,"lat":37.595,"lng":127.0571,"급지":"2급지","동":"이문동","평균출석":54.2,"출석횟수":41,"일반출석합":2224,"통계없음":false,"fallbackLat":37.595,"fallbackLng":127.0571},{"코드":308570,"이름":"일산교당","지구":"서울지구","기관유형":"","주소":"경기도 고양시 일산서구 주화로 202 (대화동)","광역":"경기","시군구":"고양시","자치구":"일산서구","관리":406,"출석":3304,"교무":2,"입교":7,"lat":37.6796,"lng":126.751,"급지":"1급지","동":"대화동","평균출석":72.9,"출석횟수":41,"일반출석합":2988,"통계없음":false,"fallbackLat":37.6796,"fallbackLng":126.751},{"코드":300662,"이름":"일영교당","지구":"기관·부속","기관유형":"수련·훈련","주소":"경기도 양주군 장흥면 삼상리","광역":"경기","시군구":"양주군","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.756,"lng":126.9617,"급지":"특급지","동":"장흥면","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.756,"fallbackLng":126.9617},{"코드":308470,"이름":"잠실교당","지구":"강남지구","기관유형":"","주소":"서울특별시 송파구 백제고분로36길 34 (석촌동)","광역":"서울","시군구":"송파구","자치구":"","관리":636,"출석":3925,"교무":2,"입교":4,"lat":37.5066,"lng":127.1064,"급지":"특급지","동":"석촌동","평균출석":79.8,"출석횟수":43,"일반출석합":3433,"통계없음":false,"fallbackLat":37.5066,"fallbackLng":127.1064},{"코드":308480,"이름":"장충교당","지구":"원남지구","기관유형":"","주소":"서울특별시 중구 동호로17길 13-4 (신당동)","광역":"서울","시군구":"중구","자치구":"","관리":150,"출석":2052,"교무":1,"입교":2,"lat":37.557,"lng":127.015,"급지":"1급지","동":"신당동","평균출석":41.9,"출석횟수":48,"일반출석합":2011,"통계없음":false,"fallbackLat":37.557,"fallbackLng":127.015},{"코드":308489,"이름":"전곡교당","지구":"종로지구","기관유형":"","주소":"경기도 연천군 전곡읍 전은길 184-40","광역":"경기","시군구":"연천군","자치구":"","관리":94,"출석":1211,"교무":1,"입교":3,"lat":38.0958,"lng":127.0739,"급지":"4급지","동":"전곡읍","평균출석":29.8,"출석횟수":39,"일반출석합":1164,"통계없음":false,"fallbackLat":38.0958,"fallbackLng":127.0739},{"코드":308490,"이름":"전농교당","지구":"원남지구","기관유형":"","주소":"서울특별시 동대문구 사가정로15길 47 (전농동)","광역":"서울","시군구":"동대문구","자치구":"","관리":205,"출석":1724,"교무":1,"입교":2,"lat":37.5783,"lng":127.0537,"급지":"2급지","동":"전농동","평균출석":40.1,"출석횟수":42,"일반출석합":1685,"통계없음":false,"fallbackLat":37.5783,"fallbackLng":127.0537},{"코드":308500,"이름":"정릉교당","지구":"종로지구","기관유형":"","주소":"서울특별시 성북구 보국문로10길 3 (정릉동)","광역":"서울","시군구":"성북구","자치구":"","관리":155,"출석":2032,"교무":1,"입교":0,"lat":37.6073,"lng":127.0123,"급지":"1급지","동":"정릉동","평균출석":40.6,"출석횟수":47,"일반출석합":1906,"통계없음":false,"fallbackLat":37.6073,"fallbackLng":127.0123},{"코드":308510,"이름":"종로교당","지구":"종로지구","기관유형":"","주소":"서울특별시 종로구 삼일대로30길 14 (낙원동)","광역":"서울","시군구":"종로구","자치구":"","관리":288,"출석":2806,"교무":2,"입교":3,"lat":37.5728,"lng":126.989,"급지":"특급지","동":"낙원동","평균출석":52.4,"출석횟수":46,"일반출석합":2409,"통계없음":false,"fallbackLat":37.5728,"fallbackLng":126.989},{"코드":308520,"이름":"중곡교당","지구":"원남지구","기관유형":"","주소":"서울특별시 광진구 긴고랑로14길 54 (중곡동)","광역":"서울","시군구":"광진구","자치구":"","관리":292,"출석":2621,"교무":1,"입교":6,"lat":37.5557,"lng":127.0805,"급지":"2급지","동":"중곡동","평균출석":56.0,"출석횟수":44,"일반출석합":2462,"통계없음":false,"fallbackLat":37.5557,"fallbackLng":127.0805},{"코드":308530,"이름":"중구교당","지구":"원남지구","기관유형":"","주소":"서울특별시 중구 퇴계로44길 24 (필동2가)","광역":"서울","시군구":"중구","자치구":"","관리":281,"출석":4136,"교무":2,"입교":4,"lat":37.5573,"lng":126.9989,"급지":"2급지","동":"필동2가","평균출석":82.6,"출석횟수":45,"일반출석합":3719,"통계없음":false,"fallbackLat":37.5573,"fallbackLng":126.9989},{"코드":308540,"이름":"태릉교당","지구":"원남지구","기관유형":"","주소":"서울특별시 노원구 동일로180길 11-3 (공릉동) 태릉교당","광역":"서울","시군구":"노원구","자치구":"","관리":246,"출석":1560,"교무":1,"입교":2,"lat":37.6206,"lng":127.0747,"급지":"4급지","동":"공릉동","평균출석":32.3,"출석횟수":44,"일반출석합":1420,"통계없음":false,"fallbackLat":37.6206,"fallbackLng":127.0747},{"코드":308580,"이름":"파주교당","지구":"서울지구","기관유형":"","주소":"경기도 파주시 파주읍 충현로 18","광역":"경기","시군구":"파주시","자치구":"","관리":190,"출석":501,"교무":1,"입교":3,"lat":37.7558,"lng":126.8055,"급지":"4급지","동":"파주읍","평균출석":12.2,"출석횟수":40,"일반출석합":486,"통계없음":false,"fallbackLat":37.7558,"fallbackLng":126.8055},{"코드":308585,"이름":"포천교당","지구":"종로지구","기관유형":"","주소":"경기도 포천시 호국로 917번길 28 (선단동)","광역":"경기","시군구":"포천시","자치구":"","관리":43,"출석":465,"교무":1,"입교":0,"lat":37.8847,"lng":127.2185,"급지":"5급지","동":"선단동","평균출석":10.7,"출석횟수":42,"일반출석합":450,"통계없음":false,"fallbackLat":37.8847,"fallbackLng":127.2185},{"코드":308953,"이름":"한강교당","지구":"여의도지구","기관유형":"","주소":"서울특별시 동작구 현충로 75 (흑석동)원불교소태산기념관 종교동 B1","광역":"서울","시군구":"동작구","자치구":"","관리":491,"출석":5948,"교무":2,"입교":11,"lat":37.5089,"lng":126.9627,"급지":"2급지","동":"흑석동","평균출석":107.8,"출석횟수":47,"일반출석합":5065,"통계없음":false,"fallbackLat":37.5089,"fallbackLng":126.9627},{"코드":300650,"이름":"한겨레중고교당","지구":"기관·부속","기관유형":"학교","주소":"경기도 안성시 죽산면 칠장로 107-9","광역":"경기","시군구":"안성시","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.0786,"lng":127.4138,"급지":"특급지","동":"죽산면","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.0786,"fallbackLng":127.4138},{"코드":300669,"이름":"헌산중교당","지구":"기관·부속","기관유형":"학교","주소":"경기도 용인시 처인구 내동로 50-13","광역":"경기","시군구":"용인시","자치구":"처인구","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.3015,"lng":127.2145,"급지":"특급지","동":"내동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.3015,"fallbackLng":127.2145},{"코드":308550,"이름":"홍제교당","지구":"서울지구","기관유형":"","주소":"서울특별시 서대문구 홍제원6길 14-12 (홍제동)","광역":"서울","시군구":"서대문구","자치구":"","관리":211,"출석":1305,"교무":1,"입교":2,"lat":37.5891,"lng":126.9434,"급지":"2급지","동":"홍제동","평균출석":26.0,"출석횟수":46,"일반출석합":1198,"통계없음":false,"fallbackLat":37.5891,"fallbackLng":126.9434},{"코드":308560,"이름":"화곡교당","지구":"화곡지구","기관유형":"","주소":"서울특별시 강서구 화곡로 34길 16","광역":"서울","시군구":"강서구","자치구":"","관리":525,"출석":3990,"교무":2,"입교":10,"lat":37.5402,"lng":126.8418,"급지":"특급지","동":"화곡동","평균출석":82.5,"출석횟수":44,"일반출석합":3630,"통계없음":false,"fallbackLat":37.5402,"fallbackLng":126.8418},{"코드":314034,"이름":"화랑대교당","지구":"특수목적","기관유형":"","주소":"서울 노원구 화랑로 574 육군사관학교 화랑대교당","광역":"서울","시군구":"노원구","자치구":"","관리":144,"출석":29,"교무":1,"입교":50,"lat":37.6176,"lng":127.0747,"급지":"6급지","동":"공릉동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.6176,"fallbackLng":127.0747},{"코드":308562,"이름":"화정교당","지구":"서울지구","기관유형":"","주소":"경기도 고양시 덕양구 화신로260번길 57 (화정동) 요진타워 8층","광역":"경기","시군구":"고양시","자치구":"덕양구","관리":223,"출석":2584,"교무":2,"입교":8,"lat":37.6347,"lng":126.8331,"급지":"1급지","동":"화정동","평균출석":52.6,"출석횟수":44,"일반출석합":2316,"통계없음":false,"fallbackLat":37.6347,"fallbackLng":126.8331},{"코드":300660,"이름":"휘경여중고교당","지구":"기관·부속","기관유형":"학교","주소":"서울특별시 동대문구 한천로 247 (휘경동) 휘경여자중학교","광역":"서울","시군구":"동대문구","자치구":"","관리":0,"출석":0,"교무":0,"입교":0,"lat":37.5887,"lng":127.0623,"급지":"2급지","동":"휘경동","평균출석":null,"출석횟수":0,"일반출석합":0,"통계없음":true,"fallbackLat":37.5887,"fallbackLng":127.0623}];
+
+const COLORS = {
+  '종로지구':   '#B8404A',
+  '서울지구':   '#2F6E73',
+  '원남지구':   '#C7884C',
+  '화곡지구':   '#5C7A4E',
+  '강남지구':   '#4760A5',
+  '여의도지구': '#8C5A95',
+  '특수목적':   '#4A4A4A',
+  '기관·부속':  '#8A8A8A',
+};
+const ORDER = ['종로지구','서울지구','원남지구','화곡지구','강남지구','여의도지구','특수목적','기관·부속'];
+const INST_TAG = {
+  '학교': '학교', '방송': '방송', '복지': '복지',
+  '수련·훈련': '수련', '문화·예술': '문화', '사업·의료': '의료',
+};
+
+const map = L.map('map', {
+  center: [37.55, 127.0], zoom: 11,
+  zoomControl: true, minZoom: 7, maxZoom: 19,
+  zoomSnap: 0.5, zoomDelta: 0.5,
+});
+
+const TILES = {
+  voyager: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap, © CARTO', subdomains: 'abcd', maxZoom: 19,
+  }),
+  osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors', maxZoom: 19,
+  }),
+  positron: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap, © CARTO', subdomains: 'abcd', maxZoom: 19,
+  }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles © Esri', maxZoom: 19,
+  }),
+};
+let currentTile = TILES.voyager;
+currentTile.addTo(map);
+document.querySelectorAll('.tool-btn[data-tile]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool-btn[data-tile]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    map.removeLayer(currentTile);
+    currentTile = TILES[btn.dataset.tile];
+    currentTile.addTo(map);
+  });
+});
+
+function markerSize(zoom) {
+  if (zoom <= 9)  return 8;
+  if (zoom <= 10) return 10;
+  if (zoom <= 11) return 12;
+  if (zoom <= 12) return 13;
+  if (zoom <= 13) return 15;
+  if (zoom <= 14) return 18;
+  if (zoom <= 15) return 21;
+  if (zoom <= 16) return 24;
+  if (zoom <= 17) return 27;
+  return 30;
+}
+
+function makeIcon(d, zoom) {
+  const isInst = d.지구 === '기관·부속';
+  const color = COLORS[d.지구] || '#888';
+  const size = markerSize(zoom) - (isInst ? 1 : 0);
+  const cls = 'gd-marker' + (isInst ? ' inst' : '') + (d.geocoded ? '' : ' pending');
+  return L.divIcon({
+    className: '',
+    html: '<div class="' + cls + '" style="background:' + color + ';width:' + size + 'px;height:' + size + 'px"></div>',
+    iconSize: [size+5, size+5],
+    iconAnchor: [(size+5)/2, (size+5)/2],
+  });
+}
+
+function makeLabelContent(d, zoom) {
+  const color = COLORS[d.지구] || '#888';
+  let inner;
+  if (zoom >= 15) {
+    inner = '<div class="lbl-name">' + d.이름 + '</div><div class="lbl-gu">' + d.지구 + '</div>';
+  } else {
+    inner = '<div class="lbl-name">' + d.이름 + '</div>';
+  }
+  return '<div class="gd-label-inner"><div class="gd-label-bar" style="background:' + color + '"></div><div class="gd-label-text">' + inner + '</div></div>';
+}
+
+const activeGroups = new Set(ORDER);
+let searchTerm = '';
+
+const filterChips = document.getElementById('filterChips');
+ORDER.forEach(g => {
+  const count = DATA.filter(d => d.지구 === g).length;
+  if (count === 0) return;
+  const chip = document.createElement('span');
+  chip.className = 'chip active' + (g === '기관·부속' ? ' inst-chip' : '');
+  chip.dataset.group = g;
+  chip.style.color = COLORS[g];
+  chip.innerHTML = '<span class="dot"></span>' + g + ' ' + count;
+  chip.addEventListener('click', () => {
+    if (activeGroups.has(g)) { activeGroups.delete(g); chip.classList.remove('active'); }
+    else { activeGroups.add(g); chip.classList.add('active'); }
+    updateToggleAllBtn();
+    refresh();
+  });
+  filterChips.appendChild(chip);
+});
+
+const toggleAllBtn = document.getElementById('toggleAll');
+function updateToggleAllBtn() {
+  const allActive = ORDER.every(g => activeGroups.has(g));
+  toggleAllBtn.textContent = allActive ? '전체 해제' : '전체 선택';
+}
+toggleAllBtn.addEventListener('click', () => {
+  const allActive = ORDER.every(g => activeGroups.has(g));
+  if (allActive) {
+    activeGroups.clear();
+    document.querySelectorAll('.chip[data-group]').forEach(c => c.classList.remove('active'));
+  } else {
+    ORDER.forEach(g => activeGroups.add(g));
+    document.querySelectorAll('.chip[data-group]').forEach(c => c.classList.add('active'));
+  }
+  updateToggleAllBtn();
+  refresh();
+});
+updateToggleAllBtn();
+
+const markers = {};
+DATA.forEach(d => {
+  d.geocoded = false;
+  if (d.lat == null || d.lng == null) return;
+
+  const m = L.marker([d.lat, d.lng], {
+    icon: makeIcon(d, map.getZoom()), riseOnHover: true,
+  });
+
+  const tagHtml = d.기관유형 ? '<span class="ptag">' + d.기관유형 + '</span>' : '';
+  const gradeHtml = (d.급지 && d.급지 !== '—') ? '<div class="pgrade">' + d.급지 + '</div>' : '';
+  const color = COLORS[d.지구] || '#888';
+  const hasStats = !d.통계없음 && d.평균출석 != null;
+  const statHtml = hasStats
+    ? '<div class="pstat">' +
+        '<div class="pstat-item"><div class="v">' + d.관리.toLocaleString() + '</div><div class="l">관리교도</div></div>' +
+        '<div class="pstat-item"><div class="v">' + d.평균출석.toFixed(1) + '</div><div class="l">평균 출석</div></div>' +
+        '<div class="pstat-item"><div class="v">' + d.교무 + '</div><div class="l">전무출신</div></div>' +
+      '</div>'
+    : '<div class="pnostat">통계 정보 없음</div>';
+
+  m.bindPopup(
+    '<div class="popup">' +
+      '<div class="phead">' +
+        '<div class="pgu" style="color:' + color + '"><span class="pgu-dot" style="background:' + color + '"></span>' + d.지구 + tagHtml + '</div>' +
+        '<div class="pname">' + d.이름 + '</div>' +
+        gradeHtml +
+      '</div>' +
+      statHtml +
+      '<div class="paddr">' + (d.주소 || '주소 없음') + '</div>' +
+    '</div>',
+    { maxWidth: 340 }
+  );
+
+  m.bindTooltip(makeLabelContent(d, 11), {
+    permanent: true, direction: 'right',
+    offset: [8, 0], className: 'gd-label', opacity: 1,
+  });
+  m.closeTooltip();
+
+  markers[d.코드] = { marker: m, data: d };
+  m.addTo(map);
+});
+
+function updateZoomDependent() {
+  const z = map.getZoom();
+  Object.values(markers).forEach(({ marker, data }) => {
+    if (!map.hasLayer(marker)) return;
+    marker.setIcon(makeIcon(data, z));
+    if (z < 13) marker.closeTooltip();
+    else {
+      marker.setTooltipContent(makeLabelContent(data, z));
+      marker.openTooltip();
+    }
+  });
+}
+map.on('zoomend', updateZoomDependent);
+
+function refresh() {
+  Object.values(markers).forEach(({ marker, data }) => {
+    const matchG = activeGroups.has(data.지구);
+    const matchS = !searchTerm || data.이름.includes(searchTerm) || (data.주소 && data.주소.includes(searchTerm));
+    if (matchG && matchS) {
+      if (!map.hasLayer(marker)) marker.addTo(map);
+    } else {
+      if (map.hasLayer(marker)) map.removeLayer(marker);
+    }
+  });
+  updateZoomDependent();
+
+  const wrap = document.getElementById('listWrap');
+  wrap.innerHTML = '';
+  const grouped = {};
+  DATA.forEach(d => {
+    if (!activeGroups.has(d.지구)) return;
+    if (searchTerm && !d.이름.includes(searchTerm) && !(d.주소 && d.주소.includes(searchTerm))) return;
+    if (!grouped[d.지구]) grouped[d.지구] = [];
+    grouped[d.지구].push(d);
+  });
+
+  ORDER.forEach(g => {
+    if (!grouped[g]) return;
+    const sect = document.createElement('div');
+    sect.className = g === '기관·부속' ? 'list-section divider' : 'list-section';
+    sect.style.color = COLORS[g];
+    sect.innerHTML =
+      '<span class="sec-name"><span class="sec-dot" style="background:' + COLORS[g] + '"></span>' + g + '</span>' +
+      '<span class="sec-cnt">' + grouped[g].length + '</span>';
+    wrap.appendChild(sect);
+
+    grouped[g].sort((a,b) => (b.관리 - a.관리) || a.이름.localeCompare(b.이름)).forEach(d => {
+      const item = document.createElement('div');
+      item.className = 'item' + (g === '기관·부속' ? ' inst' : '');
+      const tagHtml = d.기관유형 ? '<span class="tag">' + (INST_TAG[d.기관유형] || d.기관유형) + '</span>' : '';
+      const gradeHtml = (d.급지 && d.급지 !== '—') ? '<span class="grade-tag">' + d.급지 + '</span>' : '';
+      const hasStats = !d.통계없음 && d.평균출석 != null;
+      const statLine = hasStats
+        ? '관리 <b>' + d.관리.toLocaleString() + '</b> · 평균 <b>' + d.평균출석.toFixed(1) + '</b> · 교무 <b>' + d.교무 + '</b>'
+        : '<span style="color:#aaa">통계 정보 없음</span>';
+      const locLine = d.시군구 + (d.자치구 ? ' ' + d.자치구 : '') + (d.동 ? ' · ' + d.동 : '');
+      item.innerHTML =
+        '<div class="marker" style="background:' + COLORS[g] + '"></div>' +
+        '<div class="body">' +
+          '<div class="name">' + gradeHtml + tagHtml + d.이름 + '</div>' +
+          '<div class="meta">' + statLine + '</div>' +
+          '<div class="meta">' + locLine + '</div>' +
+        '</div>';
+      item.addEventListener('click', () => {
+        const m = markers[d.코드];
+        if (m && d.lat) {
+          map.flyTo([d.lat, d.lng], 16, { duration: 0.6 });
+          setTimeout(() => m.marker.openPopup(), 700);
+          document.querySelectorAll('.item').forEach(it => it.classList.remove('active'));
+          item.classList.add('active');
+        }
+      });
+      wrap.appendChild(item);
+    });
+  });
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  searchTerm = e.target.value.trim();
+  refresh();
+});
+refresh();
+
+// =============================================
+// 좌표 자동 정확화 (카카오 Local API)
+// =============================================
+const CACHE_KEY = 'wonbuddhism_seoul_geocode_kakao_v1';
+let geoCache = {};
+try {
+  const stored = localStorage.getItem(CACHE_KEY);
+  if (stored) geoCache = JSON.parse(stored);
+} catch(e) {}
+function saveCache() {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(geoCache)); } catch(e){}
+}
+
+// 캐시 적용
+let cacheHit = 0;
+DATA.forEach(d => {
+  if (!d.주소) return;
+  const cached = geoCache[d.주소];
+  if (cached && cached.lat) {
+    d.lat = cached.lat; d.lng = cached.lng; d.geocoded = true;
+    cacheHit++;
+    const m = markers[d.코드];
+    if (m) {
+      m.marker.setLatLng([d.lat, d.lng]);
+      m.marker.setIcon(makeIcon(d, map.getZoom()));
+    }
+  }
+});
+
+function extractFullAddr(addr) {
+  const m = addr.match(/^(\S+(?:특별시|광역시|도))\s+(\S+(?:시|군|구))(?:\s+(\S+구))?\s+(\S+(?:로|길|대로|번길))\s*(\d+(?:-\d+)?)/);
+  if (m) {
+    const parts = [m[1], m[2]];
+    if (m[3]) parts.push(m[3]);
+    parts.push(m[4], m[5]);
+    return parts.join(' ');
+  }
+  return null;
+}
+function extractAdminDong(addr) {
+  const adminM = addr.match(/^(\S+(?:특별시|광역시|도))\s+(\S+(?:시|군|구))(?:\s+(\S+구))?/);
+  if (!adminM) return null;
+  const dongM = addr.match(/\(([^,)]*?(동|읍|면))[^)]*\)/);
+  if (!dongM) return null;
+  const parts = [adminM[1], adminM[2]];
+  if (adminM[3]) parts.push(adminM[3]);
+  parts.push(dongM[1]);
+  return parts.join(' ');
+}
+
+async function geocodeKakao(addr) {
+  const fullAddr = extractFullAddr(addr) || addr.split(/[,(]/, 1)[0].trim();
+  
+  // 1차: 도로명+번지 검색
+  try {
+    const r = await fetch('https://dapi.kakao.com/v2/local/search/address.json?query=' + encodeURIComponent(fullAddr),
+      { headers: { 'Authorization': 'KakaoAK ' + KAKAO_REST_KEY } });
+    if (!r.ok) {
+      if (r.status === 401) throw new Error('AUTH_FAIL');
+      return null;
+    }
+    const data = await r.json();
+    if (data.documents && data.documents.length > 0) {
+      const doc = data.documents[0];
+      return { lat: parseFloat(doc.y), lng: parseFloat(doc.x), src: 'kakao-road' };
+    }
+  } catch(e) {
+    if (e.message === 'AUTH_FAIL') throw e;
+  }
+  
+  // 2차: 동까지로 폴백
+  const dongAddr = extractAdminDong(addr);
+  if (dongAddr) {
+    try {
+      const r = await fetch('https://dapi.kakao.com/v2/local/search/address.json?query=' + encodeURIComponent(dongAddr),
+        { headers: { 'Authorization': 'KakaoAK ' + KAKAO_REST_KEY } });
+      if (r.ok) {
+        const data = await r.json();
+        if (data.documents && data.documents.length > 0) {
+          const doc = data.documents[0];
+          return { lat: parseFloat(doc.y), lng: parseFloat(doc.x), src: 'kakao-dong' };
+        }
+      }
+    } catch(e) {}
+  }
+  return null;
+}
+
+function disperseDuplicates() {
+  const groups = {};
+  DATA.forEach(d => {
+    if (d.lat == null) return;
+    const k = d.lat.toFixed(5) + ',' + d.lng.toFixed(5);
+    (groups[k] = groups[k] || []).push(d);
+  });
+  Object.values(groups).forEach(group => {
+    if (group.length > 1) {
+      const baseLat = group[0].lat, baseLng = group[0].lng;
+      const radius = 0.0003;
+      group.forEach((d, i) => {
+        const angle = 2 * Math.PI * i / group.length;
+        d.lat = baseLat + radius * Math.cos(angle);
+        d.lng = baseLng + radius * Math.sin(angle) / Math.cos(baseLat * Math.PI / 180);
+        const m = markers[d.코드];
+        if (m) m.marker.setLatLng([d.lat, d.lng]);
+      });
+    }
+  });
+}
+disperseDuplicates();
+
+// === 진행 토스트 ===
+const toast = document.getElementById('geoToast');
+const gtTitle = document.getElementById('gtTitle');
+const gtStatus = document.getElementById('gtStatus');
+const gtBarFill = document.getElementById('gtBarFill');
+const gtText = document.getElementById('gtText');
+const gtEta = document.getElementById('gtEta');
+const gtClose = document.getElementById('gtClose');
+const gtReset = document.getElementById('gtReset');
+
+gtClose.addEventListener('click', () => toast.classList.add('hidden'));
+gtReset.addEventListener('click', () => {
+  if (!confirm('저장된 변환 결과를 모두 삭제하고 다시 변환하시겠어요?')) return;
+  localStorage.removeItem(CACHE_KEY);
+  geoCache = {};
+  cacheHit = 0;
+  DATA.forEach(d => {
+    if (d.fallbackLat != null) {
+      d.lat = d.fallbackLat; d.lng = d.fallbackLng; d.geocoded = false;
+      const m = markers[d.코드];
+      if (m) {
+        m.marker.setLatLng([d.lat, d.lng]);
+        m.marker.setIcon(makeIcon(d, map.getZoom()));
+      }
+    }
+  });
+  disperseDuplicates();
+  setTimeout(autoGeocode, 500);
+});
+
+const total = DATA.filter(d => d.주소).length;
+
+// 자동 변환 (페이지 로드 후 1.5초 뒤 시작)
+async function autoGeocode() {
+  const todos = DATA.filter(d => d.주소 && !d.geocoded);
+  if (todos.length === 0) {
+    // 모두 캐시됨 - 토스트 잠깐 표시 후 숨김
+    gtTitle.textContent = '✅ 좌표 정확화 완료';
+    gtStatus.textContent = '모든 ' + total + '개 교당이 정확한 위치로 표시되었습니다.';
+    gtBarFill.style.width = '100%';
+    gtText.textContent = total + ' / ' + total;
+    gtEta.textContent = '';
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3500);
+    return;
+  }
+  
+  toast.classList.remove('hidden');
+  gtTitle.textContent = '📍 좌표 정확화 중';
+  gtStatus.innerHTML = '카카오 지도로 정확한 위치를 가져옵니다...<br>' +
+    '<span style="font-size:10.5px;color:#aaa">결과는 브라우저에 저장되어 다음 방문에는 즉시 표시됩니다.</span>';
+  gtBarFill.style.width = (cacheHit / total * 100).toFixed(0) + '%';
+  
+  let done = cacheHit, success = 0, failed = 0;
+  const startTime = Date.now();
+  const failedList = [];
+  
+  // 카카오는 빠르므로 5개씩 병렬 처리
+  const batchSize = 5;
+  for (let i = 0; i < todos.length; i += batchSize) {
+    const batch = todos.slice(i, i + batchSize);
+    try {
+      await Promise.all(batch.map(async d => {
+        try {
+          const result = await geocodeKakao(d.주소);
+          if (result) {
+            d.lat = result.lat; d.lng = result.lng; d.geocoded = true;
+            geoCache[d.주소] = { lat: result.lat, lng: result.lng };
+            const m = markers[d.코드];
+            if (m) {
+              m.marker.setLatLng([d.lat, d.lng]);
+              m.marker.setIcon(makeIcon(d, map.getZoom()));
+            }
+            success++;
+          } else {
+            failed++;
+            failedList.push(d.이름);
+          }
+        } catch(e) {
+          if (e.message === 'AUTH_FAIL') throw e;
+          failed++;
+          failedList.push(d.이름);
+        }
+      }));
+    } catch(e) {
+      if (e.message === 'AUTH_FAIL') {
+        gtTitle.textContent = '⚠️ 카카오 키 인증 실패';
+        gtStatus.innerHTML = '카카오 REST API 키가 유효하지 않습니다.<br>' +
+          '<span style="font-size:10.5px">코드의 KAKAO_REST_KEY 값을 확인해주세요.</span>';
+        return;
+      }
+    }
+    saveCache();
+    done += batch.length;
+    const pct = (done / total * 100).toFixed(0);
+    gtBarFill.style.width = pct + '%';
+    gtText.textContent = done + ' / ' + total + (failed > 0 ? ' (실패 ' + failed + ')' : '');
+    const elapsed = (Date.now() - startTime) / 1000;
+    if (done < total && elapsed > 0.5) {
+      const remain = ((total - done) / (done - cacheHit + 0.1)) * elapsed;
+      gtEta.textContent = remain > 1 ? '약 ' + Math.ceil(remain) + '초' : '';
+    }
+  }
+  
+  disperseDuplicates();
+  
+  gtTitle.textContent = failed > 0 ? '⚠️ 변환 일부 실패' : '✅ 좌표 정확화 완료';
+  let statusMsg = '<b>' + success + '개</b> 변환 완료';
+  if (failed > 0) {
+    statusMsg += ', <b>' + failed + '개</b>는 동 중심 좌표 유지';
+    console.warn('카카오 변환 실패 교당:', failedList);
+  }
+  gtStatus.innerHTML = statusMsg;
+  gtEta.textContent = '';
+  setTimeout(() => toast.classList.add('hidden'), failed > 0 ? 6000 : 4000);
+}
+
+// 페이지 로드 후 자동 시작
+window.addEventListener('load', () => {
+  setTimeout(autoGeocode, 1200);
+});
+</script>
+</body>
+</html>
