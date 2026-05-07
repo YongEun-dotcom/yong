@@ -1013,8 +1013,8 @@ startBtn.addEventListener('click', async () => {
 // ⚠️ 자치구 경계 위치 미세 조정 (10시 방향=북서쪽 보정)
 // OSM 타일과 GeoJSON 단순화된 경계 사이 시각적 어긋남 보정용
 // 값을 바꿔 미세 조정 가능. 한 번에 안 맞으면 ±0.0005씩 조절해보기
-const BOUNDARY_OFFSET_LAT = 0.0020;   // 양수 = 북쪽으로, 음수 = 남쪽으로
-const BOUNDARY_OFFSET_LON = -0.0030;  // 음수 = 서쪽으로, 양수 = 동쪽으로
+const BOUNDARY_OFFSET_LAT = 0.0025;   // 양수 = 북쪽으로, 음수 = 남쪽으로
+const BOUNDARY_OFFSET_LON = -0.0020;  // 음수 = 서쪽으로, 양수 = 동쪽으로
 
 // Leaflet GeoJSON 좌표 변환 함수 (모든 polygon 점을 평행 이동)
 const SHIFTED_COORDS_TO_LATLNG = function(coords) {
